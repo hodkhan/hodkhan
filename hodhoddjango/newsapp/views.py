@@ -171,8 +171,8 @@ def stream_articles(request, username, count = 0):
         
         # allNews = json.dumps(allNews)
         print('end regressing:',time.time()-start)
-        if int(count) == 0 and flag == False:
-            saveAllNewsRating(username, mlp, tfidf_title, tfidf_abstract, trained_news_agency_columns)
+        # if int(count) == 0 and flag == False:
+        #     saveAllNewsRating(username, mlp, tfidf_title, tfidf_abstract, trained_news_agency_columns)
         print('end saving:',time.time()-start)
         return allNews
 
