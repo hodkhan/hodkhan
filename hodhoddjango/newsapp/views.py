@@ -87,44 +87,44 @@ def stream_articles(request, username, count = 0):
             
     print('loading pickles:',time.time()-start)
 
-    oldnews = News.objects.filter(published__gte=int(time.time())-86400)
+    lnews = News.objects.filter(published__gte=int(time.time())-86400)
     # oldnews = News.objects.all()
 
-    news = {0: [],1: [],2: [],3: [],4: [],5: []}
-    ids = []
-    rating = readRating(username)
-    for e in rating:
-        try:
-            x = list(filter(lambda x: x.id == e[0], oldnews))[0]
-        except:
-            continue
-        ids.append(e[0])
+    # news = {0: [],1: [],2: [],3: [],4: [],5: []}
+    # ids = []
+    # rating = readRating(username)
+    # for e in rating:
+    #     try:
+    #         x = list(filter(lambda x: x.id == e[0], oldnews))[0]
+    #     except:
+    #         continue
+    #     ids.append(e[0])
 
-        i = int(e[1])
-        if i in [0,1,2,3,4,5]:
-            news[i].append(x)
-        elif i > 5:
-            news[5].append(x)
-        else:
-            news[0].append(x)
+    #     i = int(e[1])
+    #     if i in [0,1,2,3,4,5]:
+    #         news[i].append(x)
+    #     elif i > 5:
+    #         news[5].append(x)
+    #     else:
+    #         news[0].append(x)
     
-    newNews = list(filter(lambda x: not x.id in ids, oldnews))
-    for e in newNews:
-        if flag:
-            i = 0
-        else:        
-            new_data = {"title": e.title, "abstract": e.abstract, "newsAgency": e.newsAgency.title}
-            i = int(predict_star(new_data, mlp, tfidf_title, tfidf_abstract, trained_news_agency_columns))
+    # newNews = list(filter(lambda x: not x.id in ids, oldnews))
+    # for e in newNews:
+    #     if flag:
+    #         i = 0
+    #     else:        
+    #         new_data = {"title": e.title, "abstract": e.abstract, "newsAgency": e.newsAgency.title}
+    #         i = int(predict_star(new_data, mlp, tfidf_title, tfidf_abstract, trained_news_agency_columns))
 
-        if i in [0,1,2,3,4,5]:
-            news[i].insert(0, e)
-        elif i > 5:
-            news[5].insert(0, e)
-        else:
-            news[0].insert(0, e)
+    #     if i in [0,1,2,3,4,5]:
+    #         news[i].insert(0, e)
+    #     elif i > 5:
+    #         news[5].insert(0, e)
+    #     else:
+    #         news[0].insert(0, e)
 
-    lnews = news[5] + news[4] + news[3] + news[2] + news[1] + news[0]
-    lnews = list(dict.fromkeys(lnews))
+    # lnews = news[5] + news[4] + news[3] + news[2] + news[1] + news[0]
+    # lnews = list(dict.fromkeys(lnews))
     x = []
     c = int(count)
     try:
@@ -132,7 +132,7 @@ def stream_articles(request, username, count = 0):
     except:
         x = lnews[:]
         
-    print("newNews:", len(newNews))
+    # print("newNews:", len(newNews))
     print("newsLen:", len(lnews))
     print('loading news:',time.time()-start)
     def regressor(x, mlp, tfidf_title, tfidf_abstract, trained_news_agency_columns, username, count):
