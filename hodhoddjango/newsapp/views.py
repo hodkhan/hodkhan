@@ -87,7 +87,7 @@ def stream_articles(request, username, count = 0):
             
     print('loading pickles:',time.time()-start)
 
-    oldnews = News.objects.filter(published__gte=int(time.time())-345600)
+    oldnews = News.objects.filter(published__gte=int(time.time())-86400)
     # oldnews = News.objects.all()
 
     news = {0: [],1: [],2: [],3: [],4: [],5: []}
