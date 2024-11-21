@@ -87,7 +87,7 @@ def stream_articles(request, username, count = 0):
             
     print('loading pickles:',time.time()-start)
 
-    lnews = News.objects.filter(published__gte=int(time.time())-86400)
+    oldnews = News.objects.filter(published__gte=int(time.time())-86400)
     # oldnews = News.objects.all()
 
     # news = {0: [],1: [],2: [],3: [],4: [],5: []}
@@ -109,12 +109,15 @@ def stream_articles(request, username, count = 0):
     #         news[0].append(x)
     
     # newNews = list(filter(lambda x: not x.id in ids, oldnews))
-    # for e in newNews:
-    #     if flag:
-    #         i = 0
-    #     else:        
-    #         new_data = {"title": e.title, "abstract": e.abstract, "newsAgency": e.newsAgency.title}
-    #         i = int(predict_star(new_data, mlp, tfidf_title, tfidf_abstract, trained_news_agency_columns))
+    lnews = []
+    for e in oldnews:
+        if flag:
+            i = 0
+        else:        
+            new_data = {"title": e.title, "abstract": e.abstract, "newsAgency": e.newsAgency.title}
+            i = int(predict_star(new_data, mlp, tfidf_title, tfidf_abstract, trained_news_agency_columns))
+            e.star = i
+            lnews.append(e)
 
     #     if i in [0,1,2,3,4,5]:
     #         news[i].insert(0, e)
@@ -125,6 +128,9 @@ def stream_articles(request, username, count = 0):
 
     # lnews = news[5] + news[4] + news[3] + news[2] + news[1] + news[0]
     # lnews = list(dict.fromkeys(lnews))
+    lnews.sort(key=lambda x: x.star)
+    lnews.reverse()
+
     x = []
     c = int(count)
     try:
@@ -161,8 +167,7 @@ def stream_articles(request, username, count = 0):
             if flag:
                 n['stars'] = 0
             else:
-                new_data = {"title": n["title"], "abstract": n["abstract"], "newsAgency": n["newsAgency"]}
-                n['stars'] = str(predict_star(new_data, mlp, tfidf_title, tfidf_abstract, trained_news_agency_columns))
+                n['stars'] = thenews.star
             if len(n['abstract']) > 150:
                 n['abstract'] = n['abstract'][:150] + '...'
             
