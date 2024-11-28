@@ -116,8 +116,8 @@ def stream_articles(request, username, count = 0):
         else:        
             new_data = {"title": e.title, "abstract": e.abstract, "newsAgency": e.newsAgency.title}
             i = int(predict_star(new_data, mlp, tfidf_title, tfidf_abstract, trained_news_agency_columns))
-            e.star = i
-            lnews.append(e)
+        e.star = i
+        lnews.append(e)
 
     #     if i in [0,1,2,3,4,5]:
     #         news[i].insert(0, e)
