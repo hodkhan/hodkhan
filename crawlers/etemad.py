@@ -80,7 +80,7 @@ def crawler():
     try:
         if i > 1:
             print(i)
-            print(requests.get("http://51.68.137.82:11111/dbToDjango/"))
+            print(requests.get("http://hodkhan.ir/dbToDjango/"))
     except:
         return
 
