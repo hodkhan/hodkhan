@@ -44,16 +44,16 @@ def regression():
 
         merged_df = pd.merge(user_news_df, filtered_news_df, left_on='newsId', right_on='id')
 
-        tfidf_title = TfidfVectorizer(stop_words=None, min_df=1)
-        tfidf_abstract = TfidfVectorizer(stop_words=None, min_df=1)
-
-        X_title = tfidf_title.fit_transform(merged_df['title'])
-        X_abstract = tfidf_abstract.fit_transform(merged_df['abstract'])
+        # Replace TF-IDF vectors with precomputed vectors from the database
+        X_vectors = merged_df['vector'].apply(lambda x: np.fromstring(x, sep=',')).tolist()
+        X_vectors = np.array(X_vectors)
 
         news_agency_dummies = pd.get_dummies(merged_df['newsAgency'])
 
-        X = np.hstack((X_title.toarray(), X_abstract.toarray(), news_agency_dummies.values))
+        # Combine vectors and dummy variables
+        X = np.hstack((X_vectors, news_agency_dummies.values))
         y = merged_df['star'].values
+
         try:
             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -75,10 +75,10 @@ def regression():
 
         with open(f'../pickles/{username}_MLP.pkl', 'wb') as f:
             pickle.dump(mlp, f)
-        with open(f'../pickles/{username}_tfidfTitle.pkl', 'wb') as f:
-            pickle.dump(tfidf_title, f)
-        with open(f'../pickles/{username}_tfidfAbs.pkl', 'wb') as f:
-            pickle.dump(tfidf_abstract, f)
+        # with open(f'../pickles/{username}_tfidfTitle.pkl', 'wb') as f:
+        #     pickle.dump(tfidf_title, f)
+        # with open(f'../pickles/{username}_tfidfAbs.pkl', 'wb') as f:
+        #     pickle.dump(tfidf_abstract, f)
         with open(f'../pickles/{username}_agency.pkl', 'wb') as f:
             pickle.dump(news_agency_dummies_columns, f)
 

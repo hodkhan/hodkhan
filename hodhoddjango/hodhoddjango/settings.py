@@ -164,3 +164,6 @@ CSRF_FAILURE_VIEW = 'account.views.csrf_failure'
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 XS_SHARING_ALLOWED_METHODS = ['POST','GET','OPTIONS', 'PUT', 'DELETE']
+
+    
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240 # higher than the count of fields

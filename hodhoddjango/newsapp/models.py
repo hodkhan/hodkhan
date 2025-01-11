@@ -26,6 +26,7 @@ class News(models.Model):
     link = models.CharField(max_length=1000, null=True)
     published = models.IntegerField(null=True)
     image = models.CharField(max_length=1000, null=True)
+    vector = models.TextField(null=True)
 
     def __str__(self):
         return self.title
