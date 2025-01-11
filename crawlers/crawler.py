@@ -123,7 +123,9 @@ def crawl_and_store(feed_url, source_name, conn, cursor):
         except Exception as e:
             print(f"Error processing entry from {source_name}: {e}")
             continue
-
+    print(requests.get("http://hodkhan.ir/dbToDjango/"))
+    
+    
 if __name__ == "__main__":
     # Define RSS feeds
     rss_feeds = {
