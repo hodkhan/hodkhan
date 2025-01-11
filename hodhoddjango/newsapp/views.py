@@ -199,7 +199,11 @@ def fromDbToDjango():
             newtopics = topic
         news.topic = newtopics
 
-        news.save()
+        try:
+            news.save()
+        except:
+            print("Err, continue")
+            continue
 
 def predict_star(new_vector, news_agency, mlp, trained_news_agency_columns):
     """
