@@ -92,6 +92,6 @@ def deleteFeed(requests):
     if os.path.exists(f"./../pickles/{username}_MLP.pkl"):
         os.remove(f"./../pickles/{username}_agency.pkl")
         os.remove(f"./../pickles/{username}_MLP.pkl")
-        os.remove(f"./../pickles/{username}_tfidfAbs.pkl")
-        os.remove(f"./../pickles/{username}_tfidfTitle.pkl")
+        # os.remove(f"./../pickles/{username}_tfidfAbs.pkl")
+        # os.remove(f"./../pickles/{username}_tfidfTitle.pkl")
     return redirect('/accounts/')
