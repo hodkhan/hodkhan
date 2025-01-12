@@ -72,7 +72,7 @@ def regression():
         user_news_df.loc[user_news_df['username'] == username, 'isTrained'] = 1
         user_news_df.to_sql('Viewed', user_news_conn, if_exists='replace', index=False)
 
-        news_agency_dummies_columns = news_agency_dummies.columns
+        # news_agency_dummies_columns = news_agency_dummies.columns
 
         with open(f'../pickles/{username}_MLP.pkl', 'wb') as f:
             pickle.dump(mlp, f)
@@ -80,8 +80,8 @@ def regression():
         #     pickle.dump(tfidf_title, f)
         # with open(f'../pickles/{username}_tfidfAbs.pkl', 'wb') as f:
         #     pickle.dump(tfidf_abstract, f)
-        with open(f'../pickles/{username}_agency.pkl', 'wb') as f:
-            pickle.dump(news_agency_dummies_columns, f)
+        # with open(f'../pickles/{username}_agency.pkl', 'wb') as f:
+        #     pickle.dump(news_agency_dummies_columns, f)
 
 
 if __name__ == "__main__":
