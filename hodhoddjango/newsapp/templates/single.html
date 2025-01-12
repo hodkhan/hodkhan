@@ -6,11 +6,12 @@
 {% block header %}
     <link rel="stylesheet" href="{% static 'css/single.css' %}">
     <meta name="description" content="هدخوان، خبرخوان سلیمان. {{news.title}}">
+    <meta property="og:image" content="{{news.image}}" />
 {% endblock %}
 
 {% block content %}
     <article class="article">
-        <img src="{{news.image}}" alt="تسلط بر هنر طراحی وب ریسپانسیو" class="article-image">
+        <img src="{{news.image}}" alt="{{news.title}}" class="article-image">
         <div class="article-content">
             <h1>{{news.title}}</h1>
             <div class="article-meta">
