@@ -90,7 +90,7 @@ def deleteFeed(requests):
     conn.commit()
     conn.close()
     if os.path.exists(f"./../pickles/{username}_MLP.pkl"):
-        os.remove(f"./../pickles/{username}_agency.pkl")
+        # os.remove(f"./../pickles/{username}_agency.pkl")
         os.remove(f"./../pickles/{username}_MLP.pkl")
         # os.remove(f"./../pickles/{username}_tfidfAbs.pkl")
         # os.remove(f"./../pickles/{username}_tfidfTitle.pkl")

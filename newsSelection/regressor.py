@@ -48,10 +48,11 @@ def regression():
         X_vectors = merged_df['vector'].apply(lambda x: np.fromstring(x, sep=',')).tolist()
         X_vectors = np.array(X_vectors)
 
-        news_agency_dummies = pd.get_dummies(merged_df['newsAgency'])
+        # news_agency_dummies = pd.get_dummies(merged_df['newsAgency'])
 
         # Combine vectors and dummy variables
-        X = np.hstack((X_vectors, news_agency_dummies.values))
+        # X = np.hstack((X_vectors, news_agency_dummies.values))
+        X = X_vectors
         y = merged_df['star'].values
 
         try:

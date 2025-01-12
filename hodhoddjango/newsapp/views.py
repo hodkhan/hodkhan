@@ -72,15 +72,14 @@ def stream_articles(request, username, count = 0):
 
     
     try:
-        # Load the trained model and metadata
+        # Load the trained model
         with open(f'../pickles/{username}_MLP.pkl', 'rb') as f:
             mlp = pickle.load(f)
-        with open(f'../pickles/{username}_agency.pkl', 'rb') as f:
-            trained_news_agency_columns = pickle.load(f)
         flag = False
     except:
         flag = True
-        mlp, trained_news_agency_columns = None, None
+        mlp = None
+
             
     print('loading pickles:',time.time()-start)
 
@@ -93,7 +92,7 @@ def stream_articles(request, username, count = 0):
         else:        
             # Convert the stored vector string back to a numpy array
             new_vector = np.fromstring(e.vector, sep=',')
-            i = int(predict_star(new_vector, e.newsAgency.title, mlp, trained_news_agency_columns))
+            i = int(predict_star(new_vector, mlp))
         e.star = i
         lnews.append(e)
 
@@ -205,23 +204,15 @@ def fromDbToDjango():
             print("Err, continue")
             continue
 
-def predict_star(new_vector, news_agency, mlp, trained_news_agency_columns):
+def predict_star(new_vector, mlp):
     """
     Predict the star rating using the precomputed vector and the trained model.
     """
-    # Create a one-hot encoded vector for news agency
-    news_agency_dummies = pd.get_dummies([news_agency])
-    for col in trained_news_agency_columns:
-        if col not in news_agency_dummies:
-            news_agency_dummies[col] = 0
-    news_agency_dummies = news_agency_dummies[trained_news_agency_columns]
-    
-    # Combine the vector and the one-hot encoded news agency features
-    X_new = np.hstack((new_vector, news_agency_dummies.values[0]))
-    X_new = np.array([X_new])
-    
+    X_new = np.array([new_vector])
     predicted_ratings = mlp.predict(X_new)
     return predicted_ratings[0]
+
+
 def api(requests, token):
     try:
         api = API.objects.filter(token=token)[0]
