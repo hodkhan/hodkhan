@@ -89,8 +89,9 @@ def crawl_and_store(feed_url, source_name, conn, cursor):
         d = {"Zoomit": "15", "TasnimNews": "10", "KhabarVarzeshi": "20", "GadgetNews": "35", "Etemad": "25", "donyaEEghtesad": "30"}
         new_id_base = int(f"{d[source_name]}100000") 
         new_id = max(existing_ids, default=new_id_base)
+        F = new_id
     except:
-        print("error while generating id")
+        print("Err while generating id")
         return
 
     for entry in feed.entries:
@@ -123,7 +124,10 @@ def crawl_and_store(feed_url, source_name, conn, cursor):
         except Exception as e:
             print(f"Error processing entry from {source_name}: {e}")
             continue
-    print(requests.get("http://hodkhan.ir/dbToDjango/"))
+    if F == new_id:
+        print(f"No new news found from {source_name}.")
+    else:
+        print(requests.get("http://hodkhan.ir/dbToDjango/"))
     
     
 if __name__ == "__main__":
