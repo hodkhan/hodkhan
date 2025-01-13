@@ -18,4 +18,5 @@ abstract TEXT NOT NULL,
 topic TEXT NOT NULL,
 link TEXT NOT NULL,
 published TEXT NOT NULL,
-image TEXT NOT NULL);"""
+image TEXT NOT NULL,
+vector TEXT NOT NULL);"""
