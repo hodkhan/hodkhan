@@ -3,7 +3,7 @@ import numpy as np
 import sqlite3
 
 # Load FastText model
-model_path = './../cc.fa.300.bin'  # مسیر مدل دانلودشده
+model_path = './../cc.fa.100.bin'  # مسیر مدل دانلودشده
 fasttext_model = fasttext.load_model(model_path)
 # model_path = './../cc.fa.300.q.bin'  # مسیر مدل دانلودشده
 # fasttext_model = compress_fasttext.models.CompressedFastTextKeyedVectors.load(model_path)
