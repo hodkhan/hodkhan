@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}404!{% endblock %}
+
+{% block header %}
+    <link rel="stylesheet" href="{% static 'css/account.css' %}">
+{% endblock %}
+
+{% block content %}
+<div style="text-align: center; margin-top: 50px;">
+    <h1>اوه! صفحه‌ای که دنبالش می‌گشتی پیدا نشد!</h1>
+    <img src="{% static 'images/404.png' %}" alt="404 Cat" style="width: 300px; height: auto; margin-top: 20px;">
+    <br>
+    <br>
+    <p>به نظر می‌رسه این صفحه گم شده یا هرگز وجود نداشته.</p>
+    <br>
+    <a href="/" class="btn">بازگشت به صفحه اصلی</a>
+</div>
+{% endblock %}
+  

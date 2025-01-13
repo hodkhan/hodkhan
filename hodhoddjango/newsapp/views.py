@@ -19,18 +19,19 @@ sys.path.append(module_path)
 from main import record, rating, deleteRating, readRating
 
 
-def news(request):
-    if request.user.is_authenticated:
-        username = request.user.username
+def news(requests):
+    if requests.user.is_authenticated:
+        username = requests.user.username
     else:
         username = "sampleUser"
     
-    return render(request, "index.html", context={"username": username})
+    return render(requests, "index.html", context={"username": username})
 
 def single(requests, id):
     news = News.objects.filter(id=id)
     if len(news) == 0:
         print("NotFound!")
+        return render(requests, "404.html")
     news = news[0]
     n = {}
     n["id"] = news.id
@@ -223,6 +224,8 @@ def api(requests, token):
 
 def topic(requests, topic):
     news = News.objects.filter(topic__title=topic)
+    if len(news) == 0:
+        return render(requests, "404.html")
     news = news[:24]
     allNews = []
     for thenews in news:
@@ -247,6 +250,8 @@ def topic(requests, topic):
 
 def newsAgency(requests, newsAgency):
     news = News.objects.filter(newsAgency__title=newsAgency)
+    if len(news) == 0:
+        return render(requests, "404.html")
     news = news[:24]
     allNews = []
     for thenews in news:
@@ -268,3 +273,6 @@ def newsAgency(requests, newsAgency):
         n["link"] = thenews.link
         allNews.append(n)
     return render(requests, "newsList.html", context={"news": allNews})
+
+def E404(requests, slug):
+    return render(requests, "404.html")
