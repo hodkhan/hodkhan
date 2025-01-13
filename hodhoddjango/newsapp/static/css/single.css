@@ -55,6 +55,16 @@ h1 {
     padding: 0.25rem 0.5rem;
     border-radius: 0.25rem;
     font-size: 0.875rem;
+    transition: 0.3s;
+}
+
+.tag:hover {
+    background-color: var(--secondary-foreground);
+    color: var(--secondary);
+}
+
+.tag-link {
+    text-decoration: none;
 }
 
 .author {
@@ -66,11 +76,8 @@ h1 {
     border-top: 1px solid var(--border);
 }
 
-.author-image {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    object-fit: cover;
+.author h3 {
+    transition: 0.3s;
 }
 
 .author-info h3 {
@@ -88,7 +95,13 @@ h1 {
     margin: 0 0.5rem;
 }
 
-.author-link h3:hover {
+.author h3:hover {
     color: var(--foreground);
-    transition: color 0.3s ease;
+}
+
+.author-source {
+    color: var(--primary);
+    text-decoration: none;
+    margin: 0 0.5rem;
+    margin-right: auto;
 }

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}هدخوان &ndash; HodKhan{% endblock %}
+
+{% block header %}
+	<meta name="description" content="هدخوان، خبرخوان سلیمان. خبرهای مورد علاقه خود را با هدخوان پیدا کنید">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<style>
+		.container {
+			max-width: 1500px;
+		}
+	</style>
+{% endblock %}
+
+{% block main %}
+    {% for article in news %}
+        <div class="card">
+            <a href="/news/{{article.id}}" target="_blank">
+                <img src="{{article.image}}" alt="{{article.title}}">
+                <div class="card-content">
+                    <div class="info">
+                        <h5 class="topic">{{article.topic}}</h5>
+                        <h5 class="pub">{{article.published}}</h5>
+                    </div>
+                    <h2>{{article.title}}</h2>
+                    <p>{{article.abstract}}</p>
+                    <div class="con-star">
+                        <a href="{{article.link}}" target="_blank">{{article.newsAgency}}</a>
+                        <div class="empty"></div>
+                        <div class="stars" data-article-id="{{article.id}}">
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+{% endblock %}
+

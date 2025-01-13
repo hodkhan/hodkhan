@@ -56,7 +56,6 @@ def single(requests, id):
 
     return render(requests, "single.html", context={"news": n})
 
-
 def iframe(requests, token):
     try:
         iframe = IFrame.objects.filter(token=token)[0]
@@ -212,7 +211,6 @@ def predict_star(new_vector, mlp):
     predicted_ratings = mlp.predict(X_new)
     return predicted_ratings[0]
 
-
 def api(requests, token):
     try:
         api = API.objects.filter(token=token)[0]
@@ -223,4 +221,50 @@ def api(requests, token):
     jsonNews = stream_articles(requests, username, 0)
     return HttpResponse(jsonNews.content , content_type="application/json")
 
+def topic(requests, topic):
+    news = News.objects.filter(topic__title=topic)
+    news = news[:24]
+    allNews = []
+    for thenews in news:
+        n = {}
+        n["id"] = thenews.id
+        n["newsAgency"] = thenews.newsAgency.title
+        n["title"] = thenews.title
+        n["abstract"] = thenews.abstract
+        date = int(thenews.published)
+        date = datetime.datetime.fromtimestamp(date)
+        date = pytz.timezone("GMT").localize(date)
+        date = date.astimezone(pytz.timezone("Asia/Tehran"))
+        jdate = jdatetime.datetime.fromgregorian(year=date.year,month=date.month,day=date.day, hour=date.hour, minute=date.minute, second=date.second)
+        n["published"] = str(jdate)
+        n["published"] = "".join(list(map(lambda x: x in "1234567890" and "۰۱۲۳۴۵۶۷۸۹"[int(x)] or x, n["published"])))
+        topic = thenews.topic.title
+        n["topic"] = topic
+        n["image"] = thenews.image
+        n["link"] = thenews.link
+        allNews.append(n)
+    return render(requests, "newsList.html", context={"news": allNews})
 
+def newsAgency(requests, newsAgency):
+    news = News.objects.filter(newsAgency__title=newsAgency)
+    news = news[:24]
+    allNews = []
+    for thenews in news:
+        n = {}
+        n["id"] = thenews.id
+        n["newsAgency"] = thenews.newsAgency.title
+        n["title"] = thenews.title
+        n["abstract"] = thenews.abstract
+        date = int(thenews.published)
+        date = datetime.datetime.fromtimestamp(date)
+        date = pytz.timezone("GMT").localize(date)
+        date = date.astimezone(pytz.timezone("Asia/Tehran"))
+        jdate = jdatetime.datetime.fromgregorian(year=date.year,month=date.month,day=date.day, hour=date.hour, minute=date.minute, second=date.second)
+        n["published"] = str(jdate)
+        n["published"] = "".join(list(map(lambda x: x in "1234567890" and "۰۱۲۳۴۵۶۷۸۹"[int(x)] or x, n["published"])))
+        topic = thenews.topic.title
+        n["topic"] = topic
+        n["image"] = thenews.image
+        n["link"] = thenews.link
+        allNews.append(n)
+    return render(requests, "newsList.html", context={"news": allNews})

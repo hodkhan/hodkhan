@@ -25,22 +25,26 @@
                 </div>
             </div>
             <div class="tags">
-                <span class="tag">{{news.topic}}</span>
+                <a class="tag-link" href="/topic/{{news.topic}}"><span class="tag">{{news.topic}}</span></a>
             </div>
             <div class="article-body">
                 <p>{{news.abstract}}</p>
             </div>
-            <a class="author-link" href="{{news.link}}">
-                <div class="author">
+            <div class="author">
+                <a class="author-link" href="/newsAgency/{{news.newsAgency}}">
                     <div class="author-info">
-                        <h3>منبع: {{news.newsAgency}}</h3>
+                        <h3>{{news.newsAgency}}</h3>
                     </div>
-                </div>
-            </a>
-        </div>
-    </article>
-{% endblock %}
-
+                </a>
+                <a class="author-source" href="{{news.link}}">
+                    <div class="author-info">
+                        <h3>منبع خبر</h3>
+                    </div>
+                </a>
+            </div>
+        </article>
+        {% endblock %}
+        
 {% block scripts %}
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
