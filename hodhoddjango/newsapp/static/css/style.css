@@ -66,11 +66,11 @@ nav a:hover {
 }
 
 .card {
-  background-color: var(--input);
+  background-color: var(--card);
   border-radius: 1.5rem;
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-
+  
 }
 
 .card:hover {
