@@ -162,7 +162,7 @@ def dbToDjango(requests):
 
 def fromDbToDjango():
 
-    conn = sqlite3.connect('./../news.db')
+    conn = sqlite3.connect('./../Database.db')
 
     x = list(News.objects.all().values("id"))
     ids = list(map(lambda x: x['id'], x))
