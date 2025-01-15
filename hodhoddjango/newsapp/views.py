@@ -16,7 +16,7 @@ import os
 module_path = os.path.abspath("../newsSelection/")
 sys.path.append(module_path)
 
-from main import record, rating, deleteRating, readRating
+from main import record
 
 
 def news(requests):
@@ -144,14 +144,6 @@ def stream_articles(request, username, count = 0):
 
     response = regressor(x)
     return JsonResponse({'result': response})
-
-def saveAllNewsRating(username, mlp, tfidf_title, tfidf_abstract, trained_news_agency_columns):
-    deleteRating(username)
-    news = News.objects.filter(published__gte=int(time.time())-345600)
-    for i in news:
-        new_data = {"title": i.title, "abstract": i.abstract, "newsAgency": i.newsAgency.title}
-        star = int(predict_star(new_data, mlp, tfidf_title, tfidf_abstract, trained_news_agency_columns))
-        rating(username, i.id, star)
 
 def newsRating(request):
     result = dict(request.GET)

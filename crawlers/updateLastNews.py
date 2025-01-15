@@ -49,5 +49,5 @@ def update_vectors_in_db(db_path):
     print("All vectors updated.")
 
 if __name__ == "__main__":
-    db_path = './../news.db'  # مسیر فایل دیتابیس
+    db_path = './../Database.db'
     update_vectors_in_db(db_path)

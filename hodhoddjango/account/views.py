@@ -76,7 +76,7 @@ def account(requests):
     iframes = IFrame.objects.filter(user=requests.user)
     news = len(News.objects.all())
     newsAgency = len(NewsAgency.objects.all())
-    conn = sqlite3.connect('./../userNews.db')
+    conn = sqlite3.connect('./../Database.db')
     viewed = conn.execute(f'SELECT newsId from Viewed where username = "{requests.user.username}"')
     viewed = len(viewed.fetchall())
     return render(requests, "account.html", context={"iframes": iframes, "len": len(iframes), "news": news, "newsAgency": newsAgency, "viewed": viewed})
@@ -84,9 +84,8 @@ def account(requests):
 @login_required(login_url='/accounts/login')
 def deleteFeed(requests):
     username = requests.user.username
-    conn = sqlite3.connect('./../userNews.db')
+    conn = sqlite3.connect('./../Database.db')
     conn.execute(f'DELETE from Viewed where username = "{username}"')
-    conn.execute(f'DELETE from Rating where username = "{username}"')
     conn.commit()
     conn.close()
     if os.path.exists(f"./../pickles/{username}_MLP.pkl"):

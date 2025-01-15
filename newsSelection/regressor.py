@@ -17,13 +17,12 @@ def timeout_handler(signum, frame):
 
 
 def regression():
-    user_news_conn = sqlite3.connect('./../userNews.db')
-    usernames = list(user_news_conn.execute("SELECT username from Viewed"))
+    conn = sqlite3.connect('./../Database.db')
+    usernames = list(conn.execute("SELECT username from Viewed"))
     usernames = list(map(lambda x: x[0], usernames))
     usernames = list(set(usernames))
-    user_news_df = pd.read_sql_query("SELECT * FROM Viewed", user_news_conn)
-    news_conn = sqlite3.connect('./../news.db')
-    news_df = pd.read_sql_query("SELECT * FROM News", news_conn)
+    user_news_df = pd.read_sql_query("SELECT * FROM Viewed", conn)
+    news_df = pd.read_sql_query("SELECT * FROM News", conn)
 
     for username in usernames:
         user_entries = user_news_df[user_news_df['username'] == username]
@@ -70,7 +69,7 @@ def regression():
         print(f"\033[32m{username} Mean Squared Error: {mse}\033[0m")
 
         user_news_df.loc[user_news_df['username'] == username, 'isTrained'] = 1
-        user_news_df.to_sql('Viewed', user_news_conn, if_exists='replace', index=False)
+        user_news_df.to_sql('Viewed', conn, if_exists='replace', index=False)
 
         # news_agency_dummies_columns = news_agency_dummies.columns
 

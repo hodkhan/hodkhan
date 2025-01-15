@@ -142,7 +142,7 @@ if __name__ == "__main__":
     }
 
     # Connect to the database
-    conn = sqlite3.connect('./../news.db')
+    conn = sqlite3.connect('./../Database.db')
     cursor = conn.cursor()
 
     # # Add "vector" column if not exists

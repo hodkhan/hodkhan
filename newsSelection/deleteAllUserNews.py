@@ -1,6 +1,6 @@
 import sqlite3
 
-conn = sqlite3.connect('./../userNews.db')
+conn = sqlite3.connect('./../Database.db')
 
 usernames = list(set(conn.execute("SELECT username from Viewed")))
 
@@ -13,22 +13,22 @@ conn.commit()
 conn.close()
 
 
-import sqlite3
+# import sqlite3
 
 
-tables = ["""CREATE TABLE Viewed
-(username TEXT NOT NULL,
-newsId TEXT NOT NULL);""",
-"""CREATE TABLE Interests
-(username TEXT NOT NULL,
-interest TEXT NOT NULL);"""]
+# tables = ["""CREATE TABLE Viewed
+# (username TEXT NOT NULL,
+# newsId TEXT NOT NULL);""",
+# """CREATE TABLE Interests
+# (username TEXT NOT NULL,
+# interest TEXT NOT NULL);"""]
 
-connection_obj = sqlite3.connect('./userNews.db')
+# connection_obj = sqlite3.connect('./Database.db')
  
-# cursor object
-cursor_obj = connection_obj.cursor()
-for table in tables:
+# # cursor object
+# cursor_obj = connection_obj.cursor()
+# for table in tables:
  
-    cursor_obj.execute(table)
+#     cursor_obj.execute(table)
      
-connection_obj.close()
+# connection_obj.close()
