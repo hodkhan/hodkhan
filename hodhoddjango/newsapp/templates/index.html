@@ -116,7 +116,7 @@
 
 		document.getElementById('articlesGrid').addEventListener('click', handleStarClick);
 
-		function start() {
+		{% comment %} function start() {
 			console.log(`/api/stream-articles/${i}`);
 			fetch(`/api/stream-articles/{{username}}/${i}`)
 			.then(response => response.json())
@@ -126,8 +126,34 @@
 				renderArticles();
 				i ++
 			});
-		}
+		} {% endcomment %}
 		
+		
+		let isFetching = true;
+
+		window.addEventListener('scroll', () => {
+			if (window.innerHeight + window.scrollY + 500 >= document.body.offsetHeight && !isFetching) {
+				isFetching = true;
+				start();
+			}
+		});
+		
+		function start() {
+			console.log(`/api/stream-articles/${i}`);
+			fetch(`/api/stream-articles/{{username}}/${i}`)
+			.then(response => response.json())
+			.then(data => {
+				if (data.result.length > 0) {
+					articles = data.result;
+					renderArticles();
+					i++;
+				}
+				isFetching = false;
+			})
+			.catch(() => {
+				isFetching = false;
+			});
+		}
 		start();
     </script>
 	
