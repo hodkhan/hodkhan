@@ -55,7 +55,7 @@
 							<h5 class="pub">${article.published}</h5>
 						</div>
 						<h2>${article.title}</h2>
-						<p>${article.abstract}</p>
+						<p id="abs${article.id}"></p>
 						<div class="con-star">
 							<a href="${article.link}" target="_blank">${article.newsAgency}</a>
 							<div class="empty"></div>
@@ -76,12 +76,22 @@
                 if (category === 'all' || article.topic === category) {
                     grid.appendChild(createArticleCard(article));
                 }
+				var i = 0
+				function typeWriter() {
+					if (i < article.abstract.length) {
+					  document.getElementById(`abs${article.id}`).innerHTML += article.abstract.charAt(i);
+					  i++;
+					  setTimeout(typeWriter, 10);
+					}
+				}
+				typeWriter()
             });
 			const button = document.createElement("button");
 			button.innerHTML = 'ادامه اخبار...';
 			button.style = 'grid-column: 1 / -1;';
 			button.addEventListener("click", start);
 			grid.appendChild(button);
+
         }
 
 		function handleStarClick(event) {
