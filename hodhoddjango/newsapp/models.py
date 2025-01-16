@@ -13,7 +13,7 @@ class Topic(models.Model):
 
 class NewsAgency(models.Model):
     title = models.CharField(max_length=300)
-    # persian = models.CharField(max_length=300, null=True)
+    persian = models.CharField(max_length=300, null=True)
 
     def __str__(self):
         return self.title
