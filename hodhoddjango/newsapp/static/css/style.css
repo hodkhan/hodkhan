@@ -277,7 +277,7 @@ button:hover {
   gap: 10px;
 }
 
-.btn-accept, .btn-reject {
+.btn-accept, .btn-reject, .btn-exit {
   padding: 8px 15px;
   border: none;
   border-radius: 5px;
@@ -285,6 +285,7 @@ button:hover {
   font-family: 'Vazirmatn', sans-serif;
   font-weight: bold;
   transition: background-color 0.3s ease;
+  transition: color 0.3s ease;
 }
 
 .btn-accept {
@@ -305,6 +306,18 @@ button:hover {
 .btn-reject:hover {
   background-color: var(--muted-foreground);
   color: var(--muted);
+}
+
+.btn-exit {
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0);
+  color: var(--muted-foreground);
+  float: left;
+}
+
+.btn-exit:hover {
+  background-color: rgba(0, 0, 0, 0);
+  color: var(--accent);
 }
 
 .signup-consent {

@@ -27,12 +27,13 @@
 {% block scripts %}
 	<div id="signup-consent" class="signup-consent">
         <div class="signup-content"> 
+			<button id="exit-signup" class="btn-exit">✕</button>
             <h3>ساخت حساب کاربری</h3>
             <p>با ساخت حساب کاربری در سایت، اخبار مربوط به علاقه خود را ببینید!</p>
             <div class="signup-buttons">
 				<a href="/accounts/login"><button id="reject-login" class="btn-login">ورود</button></a>
                 <a href="/accounts/signup"><button id="accept-signup" class="btn-signup">ساخت حساب</button></a>
-            </div>
+			</div>
         </div>
     </div>
 
@@ -160,10 +161,10 @@
 	<script>
         document.addEventListener('DOMContentLoaded', function() {
             const signupConsent = document.getElementById('signup-consent');
+            const exitBtn = document.getElementById('exit-signup');
 
 
             function showSignupConsent() {
-                
                 signupConsent.style.display = 'block';
             }
     
@@ -174,6 +175,10 @@
                     showSignupConsent();
                 }
             }
+
+			exitBtn.addEventListener('click', function() {
+                signupConsent.style.display = 'none';
+            });
 
             checkSignupConsent();
         });
