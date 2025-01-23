@@ -5,6 +5,15 @@
 
 {% block header %}
     <link rel="stylesheet" href="{% static 'css/account.css' %}">
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "صفحه یافت نشد",
+            "description": "متأسفانه صفحه‌ای که به دنبالش هستید پیدا نشد.",
+            "url": "{{ request.build_absolute_uri }}"
+        }
+    </script>        
 {% endblock %}
 
 {% block content %}

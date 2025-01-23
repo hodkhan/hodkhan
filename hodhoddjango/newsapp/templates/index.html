@@ -11,6 +11,20 @@
 			max-width: 1500px;
 		}
 	</style>
+	<script type="application/ld+json">
+		{
+			"@context": "https://schema.org",
+			"@type": "WebPage",
+			"name": "هدخوان",
+			"description": "هدخوان، خبرخوان سلیمان. خبرهای مورد علاقه خود را با هدخوان پیدا کنید",
+			"url": "{{ request.build_absolute_uri }}",
+			"potentialAction": {
+				"@type": "SearchAction",
+				"target": "{{ request.build_absolute_uri }}/search?q={search_term}",
+				"query-input": "required name=search_term"
+			}
+		}
+	</script>		
 {% endblock %}
 
 {% block main %}

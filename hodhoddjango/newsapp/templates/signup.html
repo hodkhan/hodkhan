@@ -6,6 +6,20 @@
 {% block header %}
     <link rel="stylesheet" href="{% static 'css/account.css' %}">
     <meta name="description" content="هدخوان، خبرخوان سلیمان. ساخت حساب در سایت">
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "صفحه ساخت حساب کاربری",
+            "description": "در این صفحه حساب کاربری جدیدی بسازید و از امکانات سایت بهره‌مند شوید.",
+            "url": "{{ request.build_absolute_uri }}",
+            "potentialAction": {
+                "@type": "RegisterAction",
+                "target": "{{ request.build_absolute_uri }}",
+                "query-input": "none"
+            }
+        }
+    </script>        
 {% endblock %}
 
 {% block content %}

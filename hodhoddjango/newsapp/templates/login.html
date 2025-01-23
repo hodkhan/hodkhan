@@ -6,6 +6,20 @@
 {% block header %}
     <link rel="stylesheet" href="{% static 'css/account.css' %}">
     <meta name="description" content="هدخوان، خبرخوان سلیمان. ورود به سایت">
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "صفحه ورود",
+            "description": "برای ورود به حساب کاربری خود به این صفحه مراجعه کنید.",
+            "url": "{{ request.build_absolute_uri }}",
+            "potentialAction": {
+                "@type": "LoginAction",
+                "target": "{{ request.build_absolute_uri }}",
+                "query-input": "none"
+            }
+        }
+    </script>        
 {% endblock %}
 
 {% block content %}
