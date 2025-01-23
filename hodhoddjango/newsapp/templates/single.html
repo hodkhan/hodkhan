@@ -7,6 +7,33 @@
     <link rel="stylesheet" href="{% static 'css/single.css' %}">
     <meta name="description" content="هدخوان، خبرخوان سلیمان. {{news.title}}">
     <meta property="og:image" content="{{news.image}}" />
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "NewsArticle",
+        "headline": "{{news.title}}",
+        "image": "{{news.image}}",
+        "datePublished": "{{news.published|date:'Y-m-d'}}",
+        "author": {
+            "@type": "Organization",
+            "name": "{{news.newsAgency}}",
+            "url": "/newsAgency/{{news.newsAgency}}"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "هدخوان",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "{% static 'images/HodHod.png' %}"
+            }
+        },
+        "description": "{{news.abstract}}",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "{{request.build_absolute_uri}}"
+        }
+    }
+    </script>
 {% endblock %}
 
 {% block content %}
@@ -43,7 +70,7 @@
                 </a>
             </div>
         </article>
-        {% endblock %}
+{% endblock %}
         
 {% block scripts %}
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
