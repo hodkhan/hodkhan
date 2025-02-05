@@ -18,23 +18,25 @@
     {% endblock %}
     <div class="container">
         <header>
-            <div class="dropdown">
-                <button class="dropbtn">حساب کاربری</button>
-                <div class="dropdown-content">
-                    {% if user.is_authenticated %}
-                        <a href="{% url 'account' %}">پروفایل</a>
-                        {% if user.is_staff %}
-                            <a href="/admin">ادمین</a>
+            <div>
+                <div class="dropdown">
+                    <button class="dropbtn">حساب کاربری</button>
+                    <div class="dropdown-content">
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'account' %}">پروفایل</a>
+                            {% if user.is_staff %}
+                                <a href="/admin">ادمین</a>
+                            {% endif %}
+                            <a href="{% url 'logout' %}">خروج</a>
+                        {% else %}
+                        <a href="{% url 'signup' %}">ساخت حساب</a>
+                        <a href="{% url 'login' %}">ورود</a>
                         {% endif %}
-                        <a href="{% url 'logout' %}">خروج</a>
-                    {% else %}
-                    <a href="{% url 'signup' %}">ساخت حساب</a>
-                    <a href="{% url 'login' %}">ورود</a>
-                    {% endif %}
+                    </div>
                 </div>
+                {% block nav %}{% endblock %}
             </div>
             <div class="logo"><a href="/">هُدخوان</a></div>
-            {% block nav %}{% endblock %}
         </header>
 
         {% block body %}{% endblock %}        

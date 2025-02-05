@@ -24,8 +24,10 @@ def news(requests):
         username = requests.user.username
     else:
         username = "sampleUser"
+
+    topics = Topic.objects.all()
     
-    return render(requests, "index.html", context={"username": username})
+    return render(requests, "index.html", context={"username": username, "topics": topics})
 
 def single(requests, id):
     news = News.objects.filter(id=id)

@@ -27,6 +27,17 @@
 	</script>		
 {% endblock %}
 
+{% block nav %}
+	<div class="dropdown">
+		<button class="dropbtn">دسته‌بندی‌ها</button>
+		<div class="dropdown-content">
+			{% for topic in topics %}
+				<a href="/topic/{{topic}}">{{topic}}</a>
+			{% endfor %}
+		</div>
+	</div>
+{% endblock %}
+
 {% block main %}
 <div class="loading">
 	<div class="typewriter">
