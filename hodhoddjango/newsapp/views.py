@@ -1,6 +1,7 @@
 from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
-from django.shortcuts import render, redirect
 from .models import News, Topic, NewsAgency, IFrame, API
+from django.shortcuts import render, redirect
+from django.db.models import Q
 import pandas as pd
 import numpy as np
 import jdatetime
@@ -273,3 +274,19 @@ def newsAgency(requests, newsAgency):
 
 def E404(requests, slug):
     return render(requests, "404.html")
+
+def search_suggestions(request):
+    query = request.GET.get('q', '').strip()
+    
+    if len(query) < 2:
+        return JsonResponse({'suggestions': []})
+    
+    # Search in news titles and get both title and id, ordered by published date
+    suggestions = News.objects.filter(
+        Q(title__icontains=query)
+    ).values('title', 'id').order_by('-published')[:5]
+    
+    # Convert QuerySet to list of dictionaries
+    suggestions = list(suggestions)
+    
+    return JsonResponse({'suggestions': suggestions})
