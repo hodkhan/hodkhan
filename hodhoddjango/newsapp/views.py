@@ -57,6 +57,8 @@ def single(requests, id):
     new_data = {"title": n["title"], "abstract": n["abstract"], "newsAgency": n["newsAgency"]}
     # n['stars'] = str(predict_star(new_data, mlp, tfidf_title, tfidf_abstract, trained_news_agency_columns))
 
+    news.views = news.views + 1
+    news.save()
     return render(requests, "single.html", context={"news": n})
 
 def iframe(requests, token):
@@ -130,6 +132,7 @@ def stream_articles(request, username, count = 0):
             n["topic"] = topic
             n["image"] = thenews.image
             n["link"] = thenews.link
+            n["views"] = thenews.views
             if flag:
                 n['stars'] = 0
             else:

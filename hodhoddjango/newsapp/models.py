@@ -28,6 +28,7 @@ class News(models.Model):
     published = models.IntegerField(null=True)
     image = models.CharField(max_length=1000, null=True)
     vector = models.TextField(null=True)
+    views = models.IntegerField(default=0)
 
     def __str__(self):
         return self.title

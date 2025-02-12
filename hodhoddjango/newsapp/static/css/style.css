@@ -209,6 +209,24 @@ header a:hover {
 }
 
 
+.stats {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.views {
+  color: var(--muted-foreground);
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.views i {
+  font-size: 1rem;
+}
+
 /* @media (max-width: 768px) {
   header {
       flex-direction: column;
