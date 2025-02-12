@@ -290,3 +290,49 @@ def search_suggestions(request):
     suggestions = list(suggestions)
     
     return JsonResponse({'suggestions': suggestions})
+
+def search(request):
+    query = request.GET.get('q', '').strip()
+    
+    if not query:
+        return redirect('/')
+        
+    # Search in news titles
+    news = News.objects.filter(
+        Q(title__icontains=query) | Q(abstract__icontains=query)
+    ).order_by('-published')[:24]
+    
+    allNews = []
+    for thenews in news:
+        n = {}
+        n["id"] = thenews.id
+        n["newsAgency"] = thenews.newsAgency.title
+        n["title"] = thenews.title
+        n["abstract"] = thenews.abstract
+        date = int(thenews.published)
+        date = datetime.datetime.fromtimestamp(date)
+        date = pytz.timezone("GMT").localize(date)
+        date = date.astimezone(pytz.timezone("Asia/Tehran"))
+        jdate = jdatetime.datetime.fromgregorian(
+            year=date.year,
+            month=date.month,
+            day=date.day, 
+            hour=date.hour, 
+            minute=date.minute, 
+            second=date.second
+        )
+        n["published"] = str(jdate)
+        n["published"] = "".join(list(map(
+            lambda x: x in "1234567890" and "۰۱۲۳۴۵۶۷۸۹"[int(x)] or x, 
+            n["published"]
+        )))
+        n["topic"] = thenews.topic.title
+        n["image"] = thenews.image
+        n["link"] = thenews.link
+        allNews.append(n)
+    
+    return render(request, "newsList.html", context={
+        "news": allNews,
+        "query": query,
+        "count": len(allNews)
+    })  

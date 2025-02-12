@@ -262,6 +262,24 @@ header a:hover {
   background-color: var(--accent);
 }
 
+.search-results-header {
+  padding: 1rem;
+  margin-bottom: 2rem;
+  background: var(--card);
+  border-radius: 1rem;
+  text-align: center;
+}
+
+.search-results-header h2 {
+  color: var(--foreground);
+  margin-bottom: 0.5rem;
+}
+
+.search-results-header p {
+  color: var(--muted-foreground);
+  font-size: 0.9rem;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));

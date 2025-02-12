@@ -1,16 +1,31 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}هدخوان &ndash; HodKhan{% endblock %}
+{% block title %}
+    {% if query %}
+        جستجو برای "{{ query }}" &ndash; هدخوان
+    {% else %}
+        اخبار &ndash; هدخوان
+    {% endif %}
+{% endblock %}
 
 {% block header %}
-	<meta name="description" content="هدخوان، خبرخوان سلیمان. خبرهای مورد علاقه خود را با هدخوان پیدا کنید">
+    <meta name="description" content="{% if query %}نتایج جستجو برای {{ query }}{% else %}لیست اخبار{% endif %} در هدخوان">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 	<style>
 		.container {
 			max-width: 1500px;
 		}
 	</style>
+{% endblock %}
+
+{% block body %}
+    {% if query %}
+        <div class="search-results-header">
+            <h2>نتایج جستجو برای "{{ query }}"</h2>
+            <p>{{ count }} خبر یافت شد</p>
+        </div>
+    {% endif %} 
 {% endblock %}
 
 {% block main %}

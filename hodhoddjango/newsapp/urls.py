@@ -27,6 +27,7 @@ urlpatterns = [
     path("iframe/<token>", views.iframe, name="news"),
     path("newsRating/", views.newsRating, name='newsRating'),
     path("dbToDjango/", views.dbToDjango, name="dbToDjango"),
+    path('search/', views.search, name='search'),
     path('api/stream-articles/<username>/<count>', views.stream_articles, name='stream_articles'),
     path('api/search-suggestions', views.search_suggestions, name='search_suggestions'),
     path('api/<token>', views.api, name='api'),

@@ -34,6 +34,15 @@
                     </div>
                 </div>
                 {% block nav %}{% endblock %}
+                <div class="search-container">
+                    <form action="/search" method="GET">
+                        <input type="text" name="q" id="search-input" placeholder="جستجو در اخبار..." required autocomplete="off">
+                        <button type="submit" class="search-button">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </form>
+                    <div class="search-dropdown" id="search-dropdown"></div>
+                </div>
             <div class="logo"><a href="/">هُدخوان</a></div>
         </header>
 
@@ -102,5 +111,70 @@
         // برای تست: این خط را اضافه کنید تا مطمئن شوید popup نمایش داده می‌شود
         // localStorage.removeItem('cookieConsent');
     </script>
+
+
+	<script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('search-input');
+            const searchDropdown = document.getElementById('search-dropdown');
+            let debounceTimer;
+
+            // Handle input changes
+            searchInput.addEventListener('input', function() {
+                clearTimeout(debounceTimer);
+                const query = this.value.trim();
+                
+                if (query.length < 2) {
+                    searchDropdown.style.display = 'none';
+                    return;
+                }
+
+                debounceTimer = setTimeout(() => {
+                    fetch(`/api/search-suggestions?q=${encodeURIComponent(query)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.suggestions?.length) {
+                                showSuggestions(data.suggestions);
+                            } else {
+                                searchDropdown.style.display = 'none';
+                            }
+                        });
+                }, 300);
+            });
+
+            // Show suggestions
+			function showSuggestions(suggestions) {
+				searchDropdown.innerHTML = suggestions
+					.map(suggestion => `
+						<div class="suggestion" onclick="selectSuggestion('${suggestion.title}', ${suggestion.id})">
+							<i class="fa fa-search"></i>
+							<span>${suggestion.title}</span>
+						</div>
+					`)
+					.join('');
+				searchDropdown.style.display = 'block';
+			}
+
+            // Handle suggestion selection
+            window.selectSuggestion = function(title, id) {
+				window.location.href = `/news/${id}`;
+            };
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !searchDropdown.contains(e.target)) {
+                    searchDropdown.style.display = 'none';
+                }
+            });
+
+            // Keyboard navigation
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    searchDropdown.style.display = 'none';
+                }
+            });
+        });
+    </script>
+
 </body>
 </html>
