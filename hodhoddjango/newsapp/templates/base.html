@@ -34,15 +34,17 @@
                     </div>
                 </div>
                 {% block nav %}{% endblock %}
-                <div class="search-container">
-                    <form action="/search" method="GET">
-                        <input type="text" name="q" id="search-input" placeholder="جستجو در اخبار..." required autocomplete="off">
-                        <button type="submit" class="search-button">
-                            <i class="fa fa-search"></i>
-                        </button>
-                    </form>
-                    <div class="search-dropdown" id="search-dropdown"></div>
-                </div>
+                {% block search %}
+                    <div class="search-container">
+                        <form action="/search" method="GET">
+                            <input type="text" name="q" id="search-input" placeholder="جستجو در اخبار..." required>
+                            <button type="submit" class="search-button">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </form>
+                        <div class="search-dropdown" id="search-dropdown"></div>
+                    </div>
+                {% endblock %}
             <div class="logo"><a href="/">هُدخوان</a></div>
         </header>
 
