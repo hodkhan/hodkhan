@@ -39,31 +39,42 @@ def extract_entry_data(entry, source):
         pub_date = time.mktime(entry.published_parsed)
         abstract = re.findall(r"\<p\>.*\<\/p\>", entry.summary)[0][3:-4]
         image = re.findall(r'src="https://.*q=\d+"', entry.summary)[0][5:-1]
+    
     elif source == "TasnimNews":
         site_id = entry.id[-7:]
         pub_date = time.mktime(entry.published_parsed)
         abstract = entry.summary
         image = entry.media_thumbnail[0]["url"]
+    
     elif source == "KhabarVarzeshi":
         site_id = re.findall(r"\/\d{6,}", entry.id)[0][1:]
         pub_date = time.mktime(entry.published_parsed)
         abstract = entry.summary
         image = entry.links[1].href
+    
     elif source == "GadgetNews":
         site_id = re.findall(r"\?p=\d{6,}", entry.id)[0][3:]
         pub_date = time.mktime(entry.published_parsed)
         abstract = re.findall(r"\<p\>[^\<]*\<\/p\>", entry.summary)[0][3:-6]
         image = re.findall(r'src="https://.*wp-content/uploads/.*\.jpg"', entry.summary)[0][5:-1]
+    
     elif source == "Etemad":
         site_id = re.findall(r"\/news-\d+", entry.link)[0][6:]
         pub_date = time.mktime(entry.published_parsed)
         abstract = re.findall(r"\<div\>.*\<\/div\>", entry.summary)[0][5:-6]
         image = re.findall(r'src="https://.*"', entry.summary)[0][5:-1]
+    
     elif source == "donyaEEghtesad":
         site_id = re.findall(r"\/\d{3,}", entry.id)[0][1:]
         pub_date = time.mktime(entry.published_parsed)
         abstract = re.findall(r"\<div\>.*\<\/div\>", entry.summary)[0][5:-6]
         image = re.findall(r'src="https://.*"', entry.summary)[0][5:-1]
+    
+    elif source == "Digiato":
+        site_id = re.findall(r"p=\d{7,}", entry.id)[0][2:]
+        pub_date = time.mktime(entry.published_parsed)
+        abstract = re.findall(r"\>[^\<]*\<\/a\>", entry.summary)[0][1:- 4]
+        image = entry.href
     else:
         raise ValueError(f"Unknown source: {source}")
 
@@ -86,7 +97,15 @@ def crawl_and_store(feed_url, source_name, conn, cursor):
         # Generate new unique IDs
         existing_ids = list(cursor.execute("SELECT id from News"))
         existing_ids = list(map(lambda x: int(x[0]), existing_ids))
-        d = {"Zoomit": "15", "TasnimNews": "10", "KhabarVarzeshi": "20", "GadgetNews": "35", "Etemad": "25", "donyaEEghtesad": "30"}
+        d = {
+            "Zoomit": "15", 
+            "TasnimNews": "10", 
+            "KhabarVarzeshi": "20", 
+            "GadgetNews": "35", 
+            "Etemad": "25", 
+            "donyaEEghtesad": "30",
+            "Digiato": "35"
+        }
         new_id_base = int(f"{d[source_name]}100000") 
         new_id = max(existing_ids, default=new_id_base)
         F = new_id
@@ -138,7 +157,8 @@ if __name__ == "__main__":
         "KhabarVarzeshi": "https://www.khabarvarzeshi.com/rss",
         "GadgetNews": "https://gadgetnews.net/feed/",
         "Etemad": "https://www.etemadonline.com/feeds/",
-        "donyaEEghtesad": "https://donya-e-eqtesad.com/feeds/"
+        "donyaEEghtesad": "https://donya-e-eqtesad.com/feeds/",
+        "Digiato": "https://digiato.com/feed"
     }
 
     # Connect to the database
