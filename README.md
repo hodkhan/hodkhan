@@ -21,7 +21,7 @@ pip install -r requirements.txt
 
 * Migrate django
 ```bash
-cd hodhoddjango
+cd hodkhan
 python3 manage.py migrate
 ```
 
@@ -73,7 +73,7 @@ conn.close()
 ## Usage
 * WebSite:
 ```bash
-cd hodhoddjango
+cd hodkhan
 python3 manage.py runserver
 ```
 

@@ -1,0 +1,13 @@
+* {
+    box-sizing: border-box;
+    margin: unset;
+    padding: unset;
+    font-family: IRANSansX, sans-serif;
+    vertical-align: top;
+    outline: none;
+}
+
+header{
+    width: 100%;
+    padding: 10px;
+}

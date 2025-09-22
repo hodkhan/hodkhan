@@ -17,17 +17,17 @@ Including another URLconf
 from django.views.generic.base import TemplateView
 from django.contrib import admin
 from django.urls import path, include
-from . import views
+from . import views, settings
+from django.conf import settings
 
 
 urlpatterns = [
     path("", include("newsapp.urls")),
     path("admin/", admin.site.urls),
-    path('accounts/', include('account.urls')), 
+    path('accounts/', include('account.urls')),
     path('cookies/', include('cookie_consent.urls')),
     path(
         "robots.txt",
         TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),
     ),
 ]
-
