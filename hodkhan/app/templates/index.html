@@ -2,7 +2,6 @@
 {% load static %}
 
 {% block title %}
-    دنگ شوs
 {% endblock %}
 {% block main %}
     <div class="loading">
@@ -32,16 +31,22 @@
                 if (category === 'all' || article.topic === category) {
                     grid.innerHTML += `
                     <div class="article" href="/news/${article.id}" target="_blank">
-				        <img class="article_cover" src="${article.image}" alt="${article.title}">
-                            <div class="article_feed_info" href="/feed/${article.feed.id}">
+                        <a href="/article/${article.id}" style="opacity: 1!important;">
+                            <img draggable="false" class="article_cover" src="${article.image}" alt="${article.title}">
+                        </a>
+                        <div class="article_feed">
+                            <a href="/feed/${article.feed.id}" style="display: flex;gap: 7px ">
                                 <img class="article_feed_favicon" src="${article.feed.favicon}">
                                 <h5 class="article_feed_name">${article.feed.name}</h5>
-                                <button>دنبال کردن</button>
-                            </div>
-						<div class="article_caption" >
+                            </a>
+                            <div class="whitespace"></div>
+                            <button class="article_feed_follow">دنبال کردن</button>
+                        </div>
+						<div class="article_caption">
+                             <a href="/article/${article.id}">
                                 <h3 class="article_title">${article.title}؛</h3>
                                 ${article.abstract}
-                            </div>
+                             </a>
 						</div>
 						<div class="con-star">
 							<div class="stats">

@@ -45,7 +45,6 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     "livereload",
     # 'account',
-    'cookie_consent',
     # 'allauth',
     # 'allauth.account',
     # 'allauth.socialaccount',

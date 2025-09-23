@@ -41,7 +41,7 @@ def article(requests, id):
     article = article[0]
     n = {}
     n["id"] = article.id
-    n["feed"] = article.feed.name
+    n["feed"] = {"id": article.feed.id, "name": article.feed.name, "favicon": article.feed.favicon}
     n["title"] = article.title
     # n["abstract"] = thearticle.abstract[:150] + "..."
     n["abstract"] = article.abstract

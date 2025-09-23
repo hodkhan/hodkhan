@@ -1,14 +1,10 @@
-@font-face {
-    src: url(../fonts/estedad.ttf);
-    font-family: estedad;
-    font-weight: 100 1000;
-}
+@import "fonts.css";
 
 * {
     box-sizing: border-box;
     margin: unset;
     padding: unset;
-    font-family: estedad, sans-serif;
+    font-family: IRANSansX, sans-serif;
     vertical-align: top;
     outline: none;
     border: none;
@@ -21,21 +17,21 @@
     --l: 50%;
     --hs: var(--h), var(--s);
     --hsl: var(--hs), var(--l);
+    --color-1: white;
 }
+
 
 body {
-    font-size: .95rem;
+    background: var(--color-1);
+    font-size: 1rem;
 }
 
-#app {
-}
-
-#app .sidebar_container {
-}
 
 #article_container {
     flex-grow: 1;
-
+    left: 50%;
+    transform: translateX(-50%);
+    position: absolute;
 }
 
 .sidebar {
@@ -56,7 +52,6 @@ a {
 }
 
 img {
-    width: 100%;
 }
 
 .article {
@@ -67,16 +62,30 @@ img {
     display: inline;
 }
 
-.article_feed_info {
+.article_feed {
     display: flex;
-    line-height: 26px;
     margin-top: 15px;
+    align-items: center;
     margin-bottom: 10px;
     gap: 7px;
 }
 
+.article_feed_name {
+    font-size: .95rem;
+    margin-top: 2px;
+}
+
+.article_feed_follow {
+    border-radius: 100px;
+    height: 33px;
+    padding: 1px 13px;
+    line-height: 33px;
+}
+
 .article_cover {
     border-radius: 5px;
+    width: 100%;
+    object-fit: cover;
 }
 
 .article_feed_favicon {
@@ -91,7 +100,7 @@ img {
 }
 
 button, input, textarea {
-    font-size: .8rem;
+    font-size: .85rem;
     border-radius: 7px;
     padding: 9px 12px 8px;
     transition: .15s;
@@ -116,4 +125,79 @@ button:active {
 button .ripple {
     background: white;
     opacity: .5;
+}
+
+.article a {
+    transition: .15s;
+    color: unset;
+}
+
+#article a {
+    transition: .15s;
+}
+
+.article a:hover, #article a:hover {
+    opacity: .7;
+}
+
+.article a:active, #article a:active {
+    opacity: .5;
+}
+
+#article_content p {
+    margin-bottom: 20px;
+}
+
+#article_content {
+    padding-top: 20px;
+}
+
+#article_content h1, #article_content h2, #article_content h3, #article_content h4, #article_content h5 {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    padding-top: 10px;
+}
+
+#article_content iframe {
+    margin-bottom: 20px;
+    border-radius: 7px;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+}
+
+#article_content figure {
+    text-align: center;
+    padding: 10px 0;
+}
+
+#article_content figcaption {
+    margin-top: -5px;
+    margin-bottom: 20px;
+    font-size: .8rem;
+}
+
+#article_content img {
+    margin: 0 auto 20px;
+    display: block;
+    max-width: calc(100% - 100px);
+    border-radius: 7px;
+}
+
+.article_cover_container {
+    overflow: hidden;
+    display: block;
+}
+
+.article_cover_container .ripple {
+    background: white;
+}
+
+#article_content ul, #article_content ol {
+    margin-top: 20px;
+    margin-right: 20px;
+    margin-bottom: 20px;
+}
+
+#article_content li {
+    margin-right: 10px;
 }
