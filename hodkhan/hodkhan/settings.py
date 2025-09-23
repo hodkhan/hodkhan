@@ -35,6 +35,7 @@ ALLOWED_HOSTS = ["127.0.0.1", "0.0.0.0", "0.0.0.0:11111", "51.68.137.82", "51.68
 # Application definition
 
 INSTALLED_APPS = [
+    'app',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,7 +43,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    'newsapp',
     "livereload",
     # 'account',
     'cookie_consent',

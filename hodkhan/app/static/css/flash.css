@@ -1,0 +1,23 @@
+.pace {
+    opacity: 1;
+    position: fixed;
+    top: 0;
+    height: 5px;
+    background: rgba(0, 0, 0, .2);
+    transition: .1s;
+}
+
+.pace,.pace-progress{
+    width: 100%;
+    height: 5px;
+    pointer-events: none;
+    user-select: none;
+    z-index: 2000;
+}
+
+.pace .pace-progress {
+    background: #1155a5;
+    position: absolute;
+    transition: .3s;
+    right: 100%;
+}

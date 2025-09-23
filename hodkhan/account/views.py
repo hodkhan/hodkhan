@@ -1,11 +1,10 @@
-from django.contrib.auth import authenticate, login, logout 
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from newsapp.models import IFrame, News, NewsAgency
+from app.models import Article, Feed
 from django.shortcuts import render, redirect
 from .forms import SignupForm, LoginForm
 import sqlite3
 import os
-
 
 
 def user_signup(request):
@@ -17,7 +16,7 @@ def user_signup(request):
             password = form.cleaned_data['password1']
             user = authenticate(request, username=username, password=password)
             if user:
-                login(request, user)    
+                login(request, user)
                 return redirect('/')
             else:
                 return redirect('login')
@@ -41,6 +40,7 @@ def user_signup(request):
         form = SignupForm()
     return render(request, 'signup.html', {'form': form, 'status': True})
 
+
 def user_login(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -49,43 +49,70 @@ def user_login(request):
             password = form.cleaned_data['password']
             user = authenticate(request, username=username, password=password)
             if user:
-                login(request, user)    
+                login(request, user)
                 return redirect('/')
             else:
                 return render(request, 'login.html', {'form': form, "status": False})
     else:
         form = LoginForm()
-    return render(request, 'login.html', {'form': form, "status" : True})
+    return render(request, 'login.html', {'form': form, "status": True})
+
 
 @login_required(login_url='/accounts/login')
 def user_logout(request):
     logout(request)
     return redirect('/')
 
+
 def privacy(requests):
     return render(requests, "privacy.html")
+
 
 def terms(requests):
     return render(requests, "terms.html")
 
+
 def csrf_failure(requests, reason=""):
     return redirect('/')
 
+
 @login_required(login_url='/accounts/login')
 def account(requests):
-    iframes = IFrame.objects.filter(user=requests.user)
-    news = len(News.objects.all())
-    newsAgency = len(NewsAgency.objects.all())
-    conn = sqlite3.connect('./../Database.db')
-    viewed = conn.execute(f'SELECT newsId from Viewed where username = "{requests.user.username}"')
+    article = len(Article.objects.all())
+    feed = len(Feed.objects.all())
+    from pathlib import Path
+    DB_PATH = Path(__file__).resolve().parent.parent / 'db.sqlite3'
+    conn = sqlite3.connect(DB_PATH)
+    q = (
+        "SELECT i.article_id FROM app_interaction i "
+        "LEFT JOIN auth_user u ON i.user_id = u.id "
+        "WHERE u.username = ? AND i.type = 'view'"
+    )
+    viewed = conn.execute(q, (requests.user.username,))
     viewed = len(viewed.fetchall())
-    return render(requests, "account.html", context={"iframes": iframes, "len": len(iframes), "news": news, "newsAgency": newsAgency, "viewed": viewed})
+    return render(
+        requests,
+        "account.html",
+        context={
+            "article": article,
+            "feed": feed,
+            "viewed": viewed,
+        },
+    )
+
 
 @login_required(login_url='/accounts/login')
 def deleteFeed(requests):
     username = requests.user.username
-    conn = sqlite3.connect('./../Database.db')
-    conn.execute(f'DELETE from Viewed where username = "{username}"')
+    from pathlib import Path
+    DB_PATH = Path(__file__).resolve().parent.parent / 'db.sqlite3'
+    conn = sqlite3.connect(DB_PATH)
+    sql = (
+        "DELETE FROM app_interaction WHERE user_id IN (SELECT id FROM auth_user "
+        "WHERE username = ?) "
+        "AND type = 'view'"
+    )
+    conn.execute(sql, (username,))
     conn.commit()
     conn.close()
     if os.path.exists(f"./../pickles/{username}_MLP.pkl"):

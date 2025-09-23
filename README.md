@@ -94,7 +94,7 @@ python3 regressor.py
 
 you can download APK from this link:
 
-[Download](https://github.com/mahdiahmadi87/hodhod/blob/fastLoad/hodhoddjango/newsapp/static/files/base.apk "github path")
+[Download](https://github.com/mahdiahmadi87/hodhod/blob/fastLoad/hodhoddjango/hodkhan/app/static/files/base.apk "github path")
 
 ## License
 

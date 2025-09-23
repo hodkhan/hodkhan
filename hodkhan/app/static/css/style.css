@@ -1,0 +1,119 @@
+@font-face {
+    src: url(../fonts/estedad.ttf);
+    font-family: estedad;
+    font-weight: 100 1000;
+}
+
+* {
+    box-sizing: border-box;
+    margin: unset;
+    padding: unset;
+    font-family: estedad, sans-serif;
+    vertical-align: top;
+    outline: none;
+    border: none;
+    --r: black;
+}
+
+:root {
+    --h: 250deg;
+    --s: 65%;
+    --l: 50%;
+    --hs: var(--h), var(--s);
+    --hsl: var(--hs), var(--l);
+}
+
+body {
+    font-size: .95rem;
+}
+
+#app {
+}
+
+#app .sidebar_container {
+}
+
+#article_container {
+    flex-grow: 1;
+
+}
+
+.sidebar {
+    width: 300px;
+    max-width: 100%;
+}
+
+#article {
+    padding: 20px;
+    max-width: 600px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+a {
+    color: hsl(var(--hsl));
+    text-decoration: unset;
+}
+
+img {
+    width: 100%;
+}
+
+.article {
+}
+
+.article_title {
+    font-size: 1rem;
+    display: inline;
+}
+
+.article_feed_info {
+    display: flex;
+    line-height: 26px;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    gap: 7px;
+}
+
+.article_cover {
+    border-radius: 5px;
+}
+
+.article_feed_favicon {
+    height: 26px;
+    width: 26px;
+    flex-shrink: 0;
+    border-radius: 5px;
+}
+
+.whitespace {
+    flex-grow: 1;
+}
+
+button, input, textarea {
+    font-size: .8rem;
+    border-radius: 7px;
+    padding: 9px 12px 8px;
+    transition: .15s;
+}
+
+button {
+    background: hsl(var(--hsl));
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: .9;
+    color: hsl(var(--hs), 90%);
+    box-shadow: hsl(var(--hsl), .3) 0 1px 4px;
+}
+
+button:active {
+    opacity: .6;
+}
+
+button .ripple {
+    background: white;
+    opacity: .5;
+}
