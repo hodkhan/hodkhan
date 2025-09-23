@@ -1,3 +1,4 @@
 pickles/
 hodkhan/db.sqlite3
 hodkhan/app/management/commands/models/*
+env/
