@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ article.title }}{% endblock %}
+{% block body %}
+    <article class="article">
+        <div id="article_head">
+            <a href="/article/{{ article.id }}" target="_blank">
+                <div class="article_info card_info">
+                    <div class="article_feed">
+                        <img class="article_feed_favicon" src="{{ article.feed.favicon }}">
+                        <h5 class="article_feed_name">{{ article.feed.name }}</h5>
+                    </div>
+                    <div class="whitespace"></div>
+                    <h5 class="article_pub">{{ article.published }}</h5>
+                </div>
+                <div class="card_content container" style="padding-top: 25px;padding-bottom: 5px">
+                    <h2 class="article_title">{{ article.title }}؛</h2>
+                    <p class="article_abstract">
+                        {{ article.abstract }}
+                    </p>
+                </div>
+            </a>
+        </div>
+        <div id="article_content">
+            {{ article.html|safe }}
+        </div>
+        <button class="fa" id="like_btn" onclick="likePost('{{ article.id }}')">
+            <img src="https://em-content.zobj.net/source/apple/81/heavy-black-heart_2764.png">
+        </button>
+    </article>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        document.querySelector('.stars').addEventListener('click', function (event) {
+            if (event.target.classList.contains('star')) {
+                const articleId = this.dataset.articleId;
+                const rating = event.target.dataset.rating;
+                console.log(`Article ID: ${articleId}, New Rating: ${rating}`);
+                $.ajax({
+                    type: "GET",
+                    url: '/articleRating',
+                    data: {
+                        "result": {"n": rating, "id": {{article.id}}},
+                    },
+                    dataType: "json",
+                });
+                // Update the stars visually
+                const stars = this.children;
+                Array.from(stars).forEach((star, index) => {
+                    star.textContent = index < rating ? '★' : '☆';
+                });
+            }
+        });
+
+        function likePost(id) {
+            $.ajax({
+                type: "GET",
+                url: '/api/interaction',
+                data: {
+                    "result": {"type": "like", "article": id, "value": "2.5"},
+                },
+                dataType: "json",
+            });
+        }
+    </script>
+{% endblock %}

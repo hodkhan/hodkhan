@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}هدخوان &ndash; HodKhan{% endblock %}
+
+{% block header %}
+    <meta name="description" content="هدخوان، خبرخوان سلیمان. خبرهای مورد علاقه خود را با هدخوان پیدا کنید">
+    <style>
+        .container {
+            max-width: 1500px;
+        }
+    </style>
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "هدخوان",
+            "description": "هدخوان، خبرخوان سلیمان. خبرهای مورد علاقه خود را با هدخوان پیدا کنید",
+            "url": "{{ request.build_absolute_uri }}",
+			"potentialAction": {
+				"@type": "SearchAction",
+				"target": "{{ request.build_absolute_uri }}/search?q={search_term}",
+				"query-input": "required name=search_term"
+			}
+		}
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div class="loading" id="articlesGridLoading">
+        <div class="typewriter">
+            <div class="slide"><i></i></div>
+            <div class="paper"></div>
+            <div class="keyboard"></div>
+        </div>
+        <h3 class="loading_title">در حال محاسبات روی اخبار...</h3>
+        <p class="loading_info">صبر کن تا از غوره حلوا درست کنم</p>
+    </div>
+    <main class="grid" id="articlesGrid">
+        <!-- Articles will be dynamically inserted here -->
+        {% block main %}{% endblock %}
+    </main>
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        let articles = [];
+        let i = 0;
+        let eventSource = null;
+        let messageCount = 0;
+
+        function createArticleCard(article) {
+            let card = `
+            <div class="card article" r>
+				<a href="/article/${article.id}" target="_blank">
+				    <div class="article_info card_info block">
+                        <div class="article_feed">
+                            <img class="article_feed_favicon" src="${article.feed.favicon}">
+				    	    <h5 class="article_feed_name">${article.feed.name}</h5>
+                        </div>
+                        <div class="whitespace"></div>
+						<h5 class="article_pub">${article.published}</h5>
+                    </div>
+					<img class="card_cover" src="${article.image}" alt="${article.title}">
+					<div class="card_content container block">
+                        <h2 class="article_title">${article.title}؛</h2>
+						<p class="article_abstract" id="abs${article.id}">
+                        </p>
+					</div>
+				</a>
+            </div>
+			`;
+            return card;
+        }
+
+        function renderArticles(category = 'all') {
+            const grid = document.getElementById('articlesGrid');
+            grid.innerHTML = '';
+            articles.forEach(article => {
+                if (category === 'all' || article.topic === category) {
+                    grid.innerHTML += createArticleCard(article);
+                }
+                var i = 0
+
+                function typeWriter() {
+                    if (i < article.abstract.length) {
+                        document.getElementById(`abs${article.id}`).innerHTML += article.abstract.charAt(i);
+                        i++;
+                        setTimeout(typeWriter, 10);
+                    }
+                }
+
+                typeWriter()
+            });
+            const button = document.createElement("button");
+            button.innerHTML = 'ادامه اخبار...';
+            button.style = 'grid-column: 1 / -1;';
+            button.addEventListener("click", start);
+            grid.appendChild(button);
+
+        }
+
+        function handleStarClick(event) {
+            if (event.target.classList.contains('star')) {
+                const articleId = event.target.closest('.stars').dataset.articleId;
+                const rating = event.target.dataset.rating;
+                $.ajax({
+                    type: "GET",
+                    url: '/newsRating',
+                    data: {
+                        "result": {"n": rating, "id": articleId},
+                    },
+                    dataType: "json",
+                });
+                // Update the stars visually
+                const stars = event.target.closest('.stars').children;
+                Array.from(stars).forEach((star, index) => {
+                    star.textContent = index < rating ? '★' : '☆';
+                });
+            }
+        }
+
+        document.getElementById('articlesGrid').addEventListener('click', handleStarClick);
+
+        {% comment %} function start() {
+            console.log(`/api/stream-articles/${i}`);
+            fetch(`/api/stream-articles/{{username}}/${i}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.result)
+                articles = data.result
+                renderArticles();
+                i ++
+            });
+        } {% endcomment %}
+
+
+        let isFetching = true;
+
+        window.addEventListener('scroll', () => {
+            if (window.innerHeight + window.scrollY + 500 >= document.body.offsetHeight && !isFetching) {
+                isFetching = true;
+                start();
+            }
+        });
+
+        function start() {
+            fetch(`/api/feed/{{username}}/${i}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('articlesGridLoading').remove()
+                    if (data.result.length > 0) {
+                        articles = data.result;
+                        renderArticles();
+                        i++;
+                    }
+                    isFetching = false;
+                })
+                .catch(() => {
+                    isFetching = false;
+                });
+        }
+
+        start();
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const signupConsent = document.getElementById('signup-consent');
+            const exitBtn = document.getElementById('exit-signup');
+
+
+            function showSignupConsent() {
+                signupConsent.style.display = 'block';
+            }
+
+
+            function checkSignupConsent() {
+                const consent = "{{user.is_authenticated}}"
+                if (consent == "False") {
+                    showSignupConsent();
+                }
+            }
+
+            exitBtn.addEventListener('click', function () {
+                signupConsent.style.display = 'none';
+            });
+
+            checkSignupConsent();
+        });
+    </script>
+{% endblock %}

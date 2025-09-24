@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}حساب کاربری{% endblock %}
+
+{% block header %}
+    <link rel="stylesheet" href="{% static 'css/account.css' %}">
+    <link rel="stylesheet" href="{% static 'css/personal.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta name="description" content="هدخوان، خبرخوان سلیمان. حساب کاربری">
+    <style>
+		.container {
+			max-width: 1500px;
+		}
+	</style>
+{% endblock %}
+
+{% block search %}{% endblock %}
+
+{% block body %}
+    <h1>سلام {{user.username}}!</h1>
+    <main class="grid2" id="articlesGrid">
+        <div class="card">
+            <div class="card-content">
+                <h1>تعداد کل اخبار</h1>
+                <h2 style="text-align: center;">{{news}} خبر</h2>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-content">
+                <h1>تعداد خبرگذاری‌ها</h1>
+                <h2 style="text-align: center;">{{newsAgency}} خبرگذاری</h2>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-content">
+                <h1>اخبار امتیاز داده‌شده</h1>
+                <h2 style="text-align: center;">{{viewed}} خبر</h2>
+                <br>
+                <button onclick="openFn()">
+                    پاک کردن اخبار دیده شده
+                </button>
+        </div>
+    </main>
+    <br>
+    {% if len == 0 %}
+        <h2>شما هیچ آی‌فریمی ندارید!</h2>
+    {% else %}
+        <h2>آی‌فریم های شما:</h2>
+    {% endif %}
+{% endblock %}
+
+{% block main %}
+    {% if len != 0 %}
+        {% for iframe in iframes %}
+            <div class="card">
+                <iframe src="/iframe/{{iframe.token}}"></iframe>
+                <div class="card-content">
+                    <h2>{{iframe.title}}</h2>
+                    <div class="iframeBox">
+                        <button onclick="copy('{{iframe.token}}')" style="flex-grow: 0; border-radius: 1rem;">کپی</button>
+                        <div class="codebox">
+                            <code>   
+                                &lt;iframe src="https://hodkhan.ir/iframe/{{iframe.token}}"&gt; &lt;/iframe&gt;
+                            </code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div id="overlay" class="hidden"></div>
+    <div id="popupDialog" class="hidden">
+        <p>
+            آیا مطمئنید میخواهید اطلاعات مربوط به اخبار دیده شده را پاک کنید؟
+        </p>
+        <button onclick="deleteFeed('yes')">
+            بله
+        </button>
+        <button onclick="deleteFeed('no')">
+            خیر
+        </button>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function openFn() {
+            const over =
+                document.getElementById(
+                    "overlay"
+                );
+            const popDialog =
+                document.getElementById(
+                    "popupDialog"
+                );
+            over.classList.toggle("hidden");
+            popDialog.classList.toggle(
+                "hidden"
+            );
+            popDialog.style.opacity =
+                popDialog.style.opacity ===
+                    "1"
+                    ? "0"
+                    : "1";
+
+        }
+
+        function deleteFeed(stat) {
+            openFn()
+            if (stat == "yes"){
+                document.location.href='/accounts/deleteFeed';
+            }
+        }
+    </script>
+    <script>
+        function copy(token) {
+            let s = `<iframe src="https://hodkhan.ir/iframe/${token}"></iframe>`    
+            navigator.clipboard.writeText(s);
+        }
+        </script>
+{% endblock %}

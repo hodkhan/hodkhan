@@ -1,0 +1,206 @@
+{% load socialaccount %} 
+{% load static %}
+<!DOCTYPE html            const grid = document.getElementById('articlesGrid');
+>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>هدخوان &ndash; HodKhan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="shortcut icon" href="{% static 'images/icon.png' %}">
+	<meta name="description" content="هدخوان، خبرخوان سلیمان. خبرهای مورد علاقه خود را با هدخوان پیدا کنید">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<style>
+		.container {
+			max-width: 1500px;
+		}
+	</style>
+</head>
+
+<body>
+    <div class="container">
+
+        <main class="grid" id="articlesGrid">
+            <div class="loading">
+                <h3>در حال محاسبات روی اخبار...</h3>
+                <div class="loader"></div>
+            </div>      
+        </main>
+    </div>
+	<div id="signup-consent" class="signup-consent">
+        <div class="signup-content"> 
+            <h3>ساخت حساب کاربری</h3>
+            <p>با ساخت حساب کاربری در سایت، اخبار مربوط به علاقه خود را ببینید!</p>
+            <div class="signup-buttons">
+				<a href="/accounts/login"><button id="reject-login" class="btn-login">ورود</button></a>
+                <a href="/accounts/signup"><button id="accept-signup" class="btn-signup">ساخت حساب</button></a>
+            </div>
+        </div>
+    </div>
+
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script>
+		let articles = [];
+		let i = 0;
+		let eventSource = null;
+		let messageCount = 0;
+
+		function createArticleCard(article) {
+			const card = document.createElement('div');
+			card.className = 'card';
+			card.innerHTML = `
+				<a href="/news/${article.id}" target="_blank">
+					<img src="${article.image}" alt="${article.title}">
+					<div class="card-content">
+						<div class="info">
+							<h5 class="topic">${article.topic}</h5>
+							<h5 class="pub">${article.published}</h5>
+						</div>
+						<h2>${article.title}</h2>
+						<p>${article.abstract}</p>
+						<div class="con-star">
+							<a href="${article.link}" target="_blank">${article.newsAgency}</a>
+							<div class="empty"></div>
+							<div class="stars" data-article-id="${article.id}">
+								${[1,2,3,4,5].map(star => `<span class="star" data-rating="${star}" alt="${article.stars}">${star <= article.stars ? '★' : '☆'}</span>`).join('')}
+							</div>
+						</div>
+					</div>
+				</a>
+			`;
+			return card;
+		}
+
+        function renderArticles(category = 'all') {
+            const grid = document.getElementById('articlesGrid');
+            grid.innerHTML = '';
+            articles.forEach(article => {
+                if (category === 'all' || article.topic === category) {
+                    grid.appendChild(createArticleCard(article));
+                }
+            });
+			const button = document.createElement("button");
+			button.innerHTML = 'ادامه اخبار...';
+			button.style = 'grid-column: 1 / -1;';
+			button.addEventListener("click", start);
+			grid.appendChild(button);
+        }
+
+		function handleStarClick(event) {
+			if (event.target.classList.contains('star')) {
+				const articleId = event.target.closest('.stars').dataset.articleId;
+				const rating = event.target.dataset.rating;
+				$.ajax({
+					type: "GET",
+					url: '/newsRating',
+					data: {
+						"result": {"n": rating, "id": articleId},
+					},
+					dataType: "json",
+				});
+				// Update the stars visually
+				const stars = event.target.closest('.stars').children;
+				Array.from(stars).forEach((star, index) => {
+					star.textContent = index < rating ? '★' : '☆';
+				});
+			}
+		}
+
+		document.getElementById('articlesGrid').addEventListener('click', handleStarClick);
+
+		function start() {
+			console.log(`/api/stream-articles/${i}`);
+			fetch(`/api/stream-articles/{{username}}/${i}`)
+			.then(response => response.json())
+			.then(data => {
+				console.log(data.result)
+				articles = data.result
+				renderArticles();
+				i ++
+			});
+		}
+		
+		start();
+    </script>
+	
+	<script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const signupConsent = document.getElementById('signup-consent');
+
+
+            function showSignupConsent() {
+                
+                signupConsent.style.display = 'block';
+            }
+    
+        
+            function checkSignupConsent() {
+                const consent = "{{user.is_authenticated}}"
+                if (consent == "False") {
+                    showSignupConsent();
+                }
+            }
+
+            checkSignupConsent();
+        });
+    </script>
+
+    
+    <div id="cookie-consent" class="alert">
+        <div class="cookie-content">
+            <h3>استفاده از کوکی‌ها</h3>
+            <p>ما برای بهبود تجربه شما از کوکی‌ها استفاده می‌کنیم. با ادامه استفاده از این سایت، شما با استفاده ما از کوکی‌ها موافقت می‌کنید.</p>
+            <div class="cookie-buttons">
+                <button id="accept-cookies" class="btn-accept">قبول می‌کنم</button>
+                <button id="reject-cookies" class="btn-reject">رد می‌کنم</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cookieConsent = document.getElementById('cookie-consent');
+            const acceptButton = document.getElementById('accept-cookies');
+            const rejectButton = document.getElementById('reject-cookies');
+        
+            function showCookieConsent() {
+                cookieConsent.style.display = 'block';
+            }
+        
+            function hideCookieConsent() {
+                cookieConsent.style.display = 'none';
+            }
+        
+            function setCookieConsent(value) {
+                localStorage.setItem('cookieConsent', value);
+                hideCookieConsent();
+            }
+        
+            function checkCookieConsent() {
+                const consent = localStorage.getItem('cookieConsent');
+                if (!consent) {
+                    setTimeout(showCookieConsent, 1000);
+                }
+            }
+        
+            acceptButton.addEventListener('click', function() {
+                setCookieConsent('accepted');
+                // اینجا می‌توانید کد اضافی برای فعال کردن کوکی‌ها اضافه کنید
+            });
+        
+            rejectButton.addEventListener('click', function() {
+                setCookieConsent('rejected');
+                // اینجا می‌توانید کد اضافی برای غیرفعال کردن کوکی‌ها اضافه کنید
+            });
+        
+            // بررسی وضعیت رضایت کوکی در هنگام بارگذاری صفحه
+            checkCookieConsent();
+        });
+        
+        // برای تست: این خط را اضافه کنید تا مطمئن شوید popup نمایش داده می‌شود
+        // localStorage.removeItem('cookieConsent');
+    </script>
+</body>
+</html>
