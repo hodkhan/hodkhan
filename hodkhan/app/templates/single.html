@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{news.title}}{% endblock %}
+
+{% block header %}
+    <link rel="stylesheet" href="{% static 'css/single.css' %}">
+    <meta name="description" content="هدخوان، خبرخوان سلیمان. {{news.title}}">
+    <meta property="og:image" content="{{news.image}}" />
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "NewsArticle",
+        "headline": "{{news.title}}",
+        "image": "{{news.image}}",
+        "datePublished": "{{news.published|date:'Y-m-d'}}",
+        "author": {
+            "@type": "Organization",
+            "name": "{{news.newsAgency}}",
+            "url": "/newsAgency/{{news.newsAgency}}"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "هدخوان",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "{% static 'images/HodHod.png' %}"
+            }
+        },
+        "description": "{{news.abstract}}",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "{{request.build_absolute_uri}}"
+        }
+    }
+    </script>
+{% endblock %}
+
+{% block content %}
+    <article class="article">
+        <img src="{{news.image}}" alt="{{news.title}}" class="article-image">
+        <div class="article-content">
+            <h1>{{news.title}}</h1>
+            <div class="article-meta">
+                <span>تاریخ انتشار: {{news.published}}</span>
+                <div class="stars" data-article-id="1">
+                    <span class="star" data-rating="1">★</span>
+                    <span class="star" data-rating="2">★</span>
+                    <span class="star" data-rating="3">★</span>
+                    <span class="star" data-rating="4">☆</span>
+                    <span class="star" data-rating="5">☆</span>
+                </div>
+            </div>
+            <div class="tags">
+                <a class="tag-link" href="/topic/{{news.topic}}"><span class="tag">{{news.topic}}</span></a>
+            </div>
+            <div class="article-body">
+                <p>{{news.abstract}}</p>
+            </div>
+            <div class="author">
+                <a class="author-link" href="/newsAgency/{{news.newsAgency}}">
+                    <div class="author-info">
+                        <h3>{{news.newsAgency}}</h3>
+                    </div>
+                </a>
+                <a class="author-source" href="{{news.link}}">
+                    <div class="author-info">
+                        <h3>منبع خبر</h3>
+                    </div>
+                </a>
+            </div>
+        </article>
+{% endblock %}
+        
+{% block scripts %}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        document.querySelector('.stars').addEventListener('click', function(event) {
+            if (event.target.classList.contains('star')) {
+                const articleId = this.dataset.articleId;
+                const rating = event.target.dataset.rating;
+                console.log(`Article ID: ${articleId}, New Rating: ${rating}`);
+                $.ajax({
+					type: "GET",
+					url: '/newsRating',
+					data: {
+						"result": {"n": rating, "id": {{news.id}}},
+					},
+					dataType: "json",
+				});
+                // Update the stars visually
+                const stars = this.children;
+                Array.from(stars).forEach((star, index) => {
+                    star.textContent = index < rating ? '★' : '☆';
+                });
+            }
+        });
+    </script>
+{% endblock %}
