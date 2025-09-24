@@ -309,6 +309,6 @@ class GemmaEmbedding:
 def load_model(model_path: str = "./EmbeddingGemma", **kwargs) -> GemmaEmbedding:
     """
     FastText-compatible factory function.
-    Usage: model = load_model("./EmbeddingGemma")
+    Usage: model = load_model("app.management.commands../EmbeddingGemma")
     """
     return GemmaEmbedding(model_path=model_path, **kwargs)

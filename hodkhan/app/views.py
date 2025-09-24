@@ -261,7 +261,7 @@ def search_suggestions(request):
     # Search in article titles and get both title and id, ordered by published date
     suggestions = Article.objects.filter(
         Q(title__icontains=query)
-    ).values('title', 'id').order_by('-published')[:5]
+    ).values('title', 'id','abstract').order_by('-published')[:5]
 
     # Convert QuerySet to list of dictionaries
     suggestions = list(suggestions)
@@ -321,13 +321,13 @@ def getArticleContentView(request, url):
     html_content.strip()
     return html_content
 
+
 def interaction(request):
     result = dict(request.GET)
     if request.user.is_authenticated:
         user = request.user
     else:
-        return JsonResponse({"404":"User Not Found"})
-    
+        return JsonResponse({"404": "User Not Found"})
 
     try:
         type_req = result["result[type]"][0]
@@ -339,7 +339,7 @@ def interaction(request):
         elif type_req == "like":
             article = Article.objects.get(id=result["result[article]"][0])
             interaction = Interaction(article=article, user=user, type="like")
-            interaction.save() 
+            interaction.save()
         elif type_req == "comment":
             pass
         elif type_req == "archive":
@@ -351,7 +351,7 @@ def interaction(request):
     except Exception as e:
         print("Error:", e)
         return JsonResponse({"400": "Bad Request"})
-    
+
     return JsonResponse({"200": "OK"})
     # id = result["result[id]"][0]
     # n = float(result["result[n]"][0])

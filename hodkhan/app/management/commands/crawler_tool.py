@@ -87,7 +87,8 @@ def fetch_and_process_html(url: str) -> str:
             if main_image and 'src' in main_image.attrs:
                 cover_image = main_image['src']
                 code += f"""<img src="{cover_image}" alt="Cover Image" style="max-width: 100%; height: auto;">"""
-    main_content = main_content.replace("sizes=","dsize=")
+    main_content = main_content.replace("sizes=", "dsize=")
+    main_content = main_content.replace("<button", "<div").replace("</button>", "</div>")
     code += f"""{main_content}
         """
     return minify_html(code)
