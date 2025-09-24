@@ -142,7 +142,8 @@ class Command(BaseCommand):
             entries = parsed.entries
             if limit:
                 entries = entries[:limit]
-            
+            self.stdout.write(f'Feed parsed! lenght: {len(entries)}')
+            i = 0
             for entry in entries:
                 try:
                     if entry.link in existing_links:
@@ -180,7 +181,7 @@ class Command(BaseCommand):
                     # Collect for batch embedding
                     articles_to_embed.append((article, entry.title + ' ' + abstract))
                     articles_to_save.append(article)
-                    
+                    self.stdout.write(f'Article {i} was successfully processed.')
                 except Exception as e:
                     self.stdout.write(f'Error processing entry: {e}')
                     continue
