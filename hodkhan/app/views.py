@@ -33,6 +33,14 @@ def index(requests):
     return render(requests, "index.html", context={"username": username, "topics": topics})
 
 
+def privacy(requests):
+    if requests.user.is_authenticated:
+        username = requests.user.username
+    else:
+        username = "sampleUser"
+    return render(requests, "privacy.html", context={"username": username})
+
+
 def article(requests, id):
     article = Article.objects.filter(id=id)
     if len(article) == 0:
@@ -205,7 +213,7 @@ def topic(requests, topic):
     for thearticle in article:
         n = {}
         n["id"] = thearticle.id
-        n["feed"] = thearticle.feed.name
+        n["feed"] = {"id": thearticle.feed.id, "name": thearticle.feed.name, "favicon": thearticle.feed.favicon}
         n["title"] = thearticle.title
         n["abstract"] = thearticle.abstract
         date = int(thearticle.published)
@@ -231,7 +239,7 @@ def feed(requests, feed):
     for thearticle in article:
         n = {}
         n["id"] = thearticle.id
-        n["feed"] = thearticle.feed.name
+        n["feed"] = {"id": thearticle.feed.id, "name": thearticle.feed.name, "favicon": thearticle.feed.favicon}
         n["title"] = thearticle.title
         n["abstract"] = thearticle.abstract
         date = int(thearticle.published)
@@ -261,7 +269,7 @@ def search_suggestions(request):
     # Search in article titles and get both title and id, ordered by published date
     suggestions = Article.objects.filter(
         Q(title__icontains=query)
-    ).values('title', 'id','abstract').order_by('-published')[:5]
+    ).values('title', 'id', 'abstract').order_by('-published')[:5]
 
     # Convert QuerySet to list of dictionaries
     suggestions = list(suggestions)
@@ -284,7 +292,8 @@ def search(request):
     for thearticle in article:
         n = {}
         n["id"] = thearticle.id
-        n["feed"] = thearticle.feed.name
+        n["feed"] = {"id": thearticle.feed.id, "name": thearticle.feed.name, "favicon": thearticle.feed.favicon}
+
         n["title"] = thearticle.title
         n["abstract"] = thearticle.abstract
         date = int(thearticle.published)
@@ -309,9 +318,9 @@ def search(request):
         allArticle.append(n)
 
     return render(request, "articleList.html", context={
-        "article": allArticle,
+        "articles": allArticle,
         "query": query,
-        "count": len(allArticle)
+        "count": str(len(allArticle)).translate(str.maketrans('0123456789','۰۱۲۳۴۵۶۷۸۹'))
     })
 
 

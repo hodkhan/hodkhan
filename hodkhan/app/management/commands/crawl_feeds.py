@@ -131,7 +131,7 @@ class Command(BaseCommand):
             return
 
         existing_links = set(Article.objects.values_list('link', flat=True))
-        
+
         # NEW: Batch processing for embeddings
         articles_to_embed = []
         articles_to_save = []
@@ -149,13 +149,13 @@ class Command(BaseCommand):
                     if entry.link in existing_links:
                         continue
                     data = extract_entry_data(entry, feed.name)
-                    
+
                     # classification (best-effort)
                     try:
                         classifier(entry.title + "\n" + data['abstract'])
                     except Exception:
                         pass
-                    
+
                     # determine a new id: use incrementing numeric id
                     # based on existing max
                     max_id = Article.objects.all().order_by('-id').first()
@@ -163,12 +163,11 @@ class Command(BaseCommand):
                         new_id = str(int(max_id.id) + 1)
                     else:
                         new_id = str(int(time.time()))[:10]
-                    
+
                     cover = get_cover(entry.link)
                     abstract = clean_caption(entry.summary)
-                    
+
                     article = Article(
-                        id=new_id,
                         title=entry.title,
                         abstract=abstract,
                         feed=feed,
@@ -177,24 +176,23 @@ class Command(BaseCommand):
                         cover=cover,
                         vector=None,  # Will be set after embedding
                     )
-                    
-                    # Collect for batch embedding
+
                     articles_to_embed.append((article, entry.title + ' ' + abstract))
                     articles_to_save.append(article)
                     self.stdout.write(f'Article {i} was successfully processed.')
                 except Exception as e:
                     self.stdout.write(f'Error processing entry: {e}')
                     continue
-        
+
         # NEW: Batch embedding generation
         if articles_to_embed and embedding_model:
             self.stdout.write(f'Generating embeddings for {len(articles_to_embed)} articles...')
             texts = [text for _, text in articles_to_embed]
-            
+
             try:
                 # Get embeddings in batch
                 embeddings = embedding_model.get_embeddings(texts)
-                
+
                 # Assign embeddings to articles
                 for (article, _), embedding in zip(articles_to_embed, embeddings):
                     if embedding is not None:
@@ -217,7 +215,7 @@ class Command(BaseCommand):
                             article.vector = vector_str
                     except Exception:
                         pass
-        
+
         # Save all articles
         added = 0
         for article in articles_to_save:
@@ -228,12 +226,12 @@ class Command(BaseCommand):
                 self.stdout.write(f'Added: {article.title}')
             except Exception as e:
                 self.stdout.write(f'Error saving article: {e}')
-        
+
         if added == 0:
             self.stdout.write('No new items added')
         else:
             self.stdout.write(f'Successfully added {added} articles')
-            
+
         # NEW: Clear embedding cache to free memory
         if embedding_model:
             embedding_model.clear_cache()

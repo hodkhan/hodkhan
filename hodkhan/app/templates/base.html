@@ -4,14 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{% endblock %}</title>
+    <title>هدخوان | {% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+          integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <script src="{% static 'js/pace.js' %}"></script>
     <script src="{% static 'js/ripple.js' %}"></script>
     <script src="{% static 'js/jquery.min.js' %}"></script>
-    <link rel="shortcut icon" href="{% static 'images/icon.png' %}">
+    <link rel="shortcut icon" href="{% static 'images/logo.png' %}">
     {% block header %}
     {% endblock %}
 </head>
@@ -21,43 +23,79 @@
 <div id="pages_container" class="container">
     <div id="pages_container" class="container">
         <div class="page_container sidebar_container container" id="right_sidebar_container">
-            <div class="page sidebar">
-                <header>
+            <div class="page sidebar block">
+                <header id="header">
                     <a href="/"><img id="logo" src="{% static "images/logo.png" %}"></a>
-                    <div class="dropdown">
-                        <button id="account_button" class="dropbtn fa"><img
-                                src="https://ui-avatars.com/api/?name={{ request.user.username }}&size=40">
-                        </button>
-                        <div class="dropdown-content">
-                            {% if user.is_authenticated %}
-                                <a href="{% url 'account' %}">پروفایل</a>
-                                {% if user.is_staff %}
-                                    <a href="/admin">ادمین</a>
-                                {% endif %}
-                                <a href="{% url 'logout' %}">خروج</a>
-                            {% else %}
-                                <a href="{% url 'signup' %}">ساخت حساب</a>
-                                <a href="{% url 'login' %}">ورود</a>
-                            {% endif %}
-                        </div>
-                    </div>
+                    <div class="whitespace"></div>
+                    {% if user.is_authenticated %}
+                        <a href="/account">
+                            <button id="account_button" class="dropbtn fa"><img
+                                    src="https://ui-avatars.com/api/?name={{ request.user.username }}&size=40">
+                            </button>
+                        </a>
+                    {% endif %}
                 </header>
+                <a href="/"><h2>هدخوان</h2></a>
+                <p style="margin-top: -5px">خبرخوان هوشمند فارسی</p>
+                <ul class="sidebar_footer ui_list">
+                    {% if user.is_authenticated %}
+                        <li>
+                            <a r href="{% url 'account' %}" class="transparent">
+                                <i class="fa fa-user"></i>
+                                پروفایل
+                            </a>
+                        </li>
+                        {% if user.is_staff %}
+                            <li>
+                                <a r href="/admin" class="transparent">
+                                    <i class="fa fa-gear"></i>
+                                    ادمین
+                                </a>
+                            </li>
+                        {% endif %}
+                        <li>
+                            <a r href="{% url 'logout' %}" style="margin-top: 10px">
+                                <i class="fa fa-right-to-bracket"></i>
+                                خروج
+                            </a>
+                        </li>
+                    {% else %}
+                        <li>
+                            <a r href="{% url 'signup' %}">
+                                <i class="fa fa-user"></i>
+                                ثبت نام
+                            </a>
+                        </li>
+                        <li>
+                            <a r href="{% url 'login' %}">
+                                <i class="fa fa-right-to-bracket"></i>
+                                ورود به حساب
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
                 {% block right_sidebar %}{% endblock %}
             </div>
         </div>
-        <div class="page_container main_container container">
+        <div class="page_container active main_container container">
             <div class="page" id="mainpage">
                 <div id="mainpage_nav">
-                    <div class="block container">
+                    <div class="block container" id="vf">
                         {% block nav %}
                             {% block search %}
-                                <div class="input_container">
+                                <a href="/" style="display:none;" class="mobile"><img
+                                        style="width: 33px;margin: 5px" src="{% static "images/logo.png" %}"></a>
+                                <div class="input_container" id="df">
                                     <form action="/search" method="GET">
-                                        <input type="text" name="q" id="search-input" placeholder="جستجو در اخبار..."
+                                        <input type="text" name="q" id="search-input"
+                                               placeholder="هر چیز که در جستن آنی، آنی..."
                                                required>
                                         <button r type="submit" class="input_button fa fa-search"></button>
                                     </form>
                                     <div class="card" id="search-dropdown"></div>
+                                    <button style="left: 0;display: none;position: absolute;background: hsl(var(--hsl),.2);color: hsl(var(--hsl));--r:hsl(var(--hsl))"
+                                            r
+                                            type="submit" class="mobile fa fa-bars"></button>
                                 </div>
                             {% endblock %}
                         {% endblock %}
@@ -70,7 +108,36 @@
         </div>
         <div class="page_container sidebar_container container" id="left_sidebar_container">
             <div class="page sidebar">
+                <div class="card no_hover">
+                    <div class="block">
+                        <h1>هدخوان در رسانه ها</h1>
+                        <p>برای اطلاع از بروزرسانی ها، اخبار و اتفاقات مربوط به هدخوان، ما رو تو تلگرام دنبال کنید</p>
+                        <button style="width: 100%;margin-top: 20px">عضویت در کانال</button>
+                    </div>
+                </div>
                 {% block left_sidebar %}{% endblock %}
+                <div class="block sidebar_footer">
+                    <ul class="ui_list">
+                        <li style="margin-bottom: 5px">
+                            <a r href="http://t.me/hodkhan">
+                                <i class="fab fa-telegram"></i>
+                                کانال تلگرام هدخوان
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 10px">
+                            <a r href="/privacy">
+                                <i class="fa fa-user-lock"></i>
+                                سیاست حفظ حریم خصوصی
+                            </a>
+                        </li>
+                    </ul>
+                    <footer id="copyright">
+                        مطالب موجود در هدخوان از وبسایت های خبری و شبکه های اجتماعی تغذیه می شوند و این پلتفرم هیچ گونه
+                        مسئولیتی در قبال محتوای منتشر شده ندارد.
+                        <hr>
+                        © تمامی حقوق این پلتفرم برای هدخوان (کلاغ) محفوظ است.
+                    </footer>
+                </div>
             </div>
         </div>
     </div>
@@ -79,8 +146,13 @@
     {% endblock %}
 
     <script>
-        function alert(html, id = "") {
+        function alert(html, id = "", tdime = false) {
             document.body.innerHTML += `<div id="${id}" class="card alert block">${html}</div>`
+            if (tdime) {
+                setTimeout(() => {
+                    document.querySelector('.alert').remove()
+                }, tdime)
+            }
         }
     </script>
     <script>
@@ -93,24 +165,25 @@
         <h3>استفاده از کوکی‌ها</h3>
         <p>ما برای بهبود تجربه شما از کوکی‌ها استفاده می‌کنیم. با ادامه استفاده از این سایت، شما با استفاده ما از کوکی‌ها موافقت می‌کنید.</p>
                     <div class="cookie-buttons">
-                    <button id="accept-cookies" class="btn-accept">قبول می‌کنم</button>
+                    <button id="accept-cookies" onclick="localStorage.setItem('cookieConsent','accept');$('#cookie_consent').remove()" class="btn-accept">قبول می‌کنم</button>
                     <button id="reject-cookies" class="btn-reject">رد می‌کنم</button>
                     </div>
     `, "cookie_consent")
                     } else {
-
-                        alert(`
+                        setTimeout(() => {
+                            alert(`
                         <h3>ساخت حساب کاربری</h3>
                         <p>با ساخت حساب کاربری در سایت، اخبار مربوط به علاقه خود را ببینید!</p>
                         <div class="alert_buttons">
-                            <a href="/accounts/login">
+                            <a href="/account/login">
                                 <button id="reject-login" class="btn-login">ورود</button>
                             </a>
-                            <a href="/accounts/signup">
+                            <a href="/account/signup">
                                 <button id="accept-signup" class="btn-signup">ساخت حساب</button>
                             </a>
                         </div>
                 `)
+                        }, 10000)
                     }
                 }
 
@@ -155,10 +228,10 @@
                 if (suggestions.length) {
                     searchDropdown.innerHTML = suggestions
                         .map(suggestion => `
-						<div class="suggestion" onclick="selectSuggestion('${suggestion.title}', ${suggestion.id})">
+						<a class="suggestion" r href="/article/${suggestion.id}">
 							<div class="suggestion_title">${suggestion.title}</div>؛
                             <div class="suggestion_abstract">${suggestion.abstract}</div>
-						</div>
+						</a>
 					`)
                         .join('');
                 } else {
@@ -187,6 +260,6 @@
             });
         });
     </script>
-
+</div>
 </body>
 </html>

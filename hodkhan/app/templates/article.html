@@ -25,36 +25,31 @@
         <div id="article_content">
             {{ article.html|safe }}
         </div>
-        <button class="fa" id="like_btn" onclick="likePost('{{ article.id }}')">
-            <img src="https://em-content.zobj.net/source/apple/81/heavy-black-heart_2764.png">
-        </button>
+        <ul class="ui_list" style="padding-bottom: 100px!important;">
+            <li r onclick="followFeed({{ article.feed.id }})">
+                <i class="fa fa-plus-circle"></i>
+                دنبال کردن این منبع
+            </li>
+            <li r>
+                <i class="fa fa-share"></i>
+                اشتراک گذاری
+            </li>
+            <li r>
+                <i class="fa fa-flag"></i>
+                ثبت گزارش برای این مطلب
+            </li>
+        </ul>
+        {% if user.is_authenticated %}
+            <button class="fa" id="like_btn" onclick="likeArticle('{{ article.id }}');this.remove();alert('لایک با موفقیت ثبت شد','3d',2000)">
+                <img src="https://em-content.zobj.net/source/apple/81/heavy-black-heart_2764.png">
+            </button>
+        {% endif %}
     </article>
 {% endblock %}
 
 {% block scripts %}
     <script>
-        document.querySelector('.stars').addEventListener('click', function (event) {
-            if (event.target.classList.contains('star')) {
-                const articleId = this.dataset.articleId;
-                const rating = event.target.dataset.rating;
-                console.log(`Article ID: ${articleId}, New Rating: ${rating}`);
-                $.ajax({
-                    type: "GET",
-                    url: '/articleRating',
-                    data: {
-                        "result": {"n": rating, "id": {{article.id}}},
-                    },
-                    dataType: "json",
-                });
-                // Update the stars visually
-                const stars = this.children;
-                Array.from(stars).forEach((star, index) => {
-                    star.textContent = index < rating ? '★' : '☆';
-                });
-            }
-        });
-
-        function likePost(id) {
+        function likeArticle(id) {
             $.ajax({
                 type: "GET",
                 url: '/api/interaction',
@@ -64,5 +59,33 @@
                 dataType: "json",
             });
         }
+
+        function viewArticle(id,value) {
+            $.ajax({
+                type: "GET",
+                url: '/api/interaction',
+                data: {
+                    "result": {"type": "view", "article": id, "value": value},
+                },
+                dataType: "json",
+            });
+        }
+
+        for (let i = 0; i < 5; i++) {
+            setTimeout(()=>{
+                viewArticle(id,2)
+            },5000)
+        }
+        function followFeed(id) {
+            $.ajax({
+                type: "GET",
+                url: '/api/interaction',
+                data: {
+                    "result": {"type": "follow", "feed": id, "value": "5"},
+                },
+                dataType: "json",
+            });
+        }
+
     </script>
 {% endblock %}

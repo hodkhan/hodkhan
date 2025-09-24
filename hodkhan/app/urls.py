@@ -3,7 +3,8 @@ from . import views
 
 urlpatterns = [
     path("", views.index, name="index"),
-    path("news/", views.index, name="news"),
+    path("feed/", views.index, name="feed"),
+    path("privacy/", views.privacy, name="privacy"),
     path("article/<id>", views.article, name="article"),
     path("topic/<topic>", views.topic, name="topic"),
     path("dbToDjango/", views.dbToDjango, name="dbToDjango"),

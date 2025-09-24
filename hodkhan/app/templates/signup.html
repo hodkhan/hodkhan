@@ -2,57 +2,52 @@
 {% load static %}
 
 {% block title %}ساخت حساب{% endblock %}
-
-{% block header %}
-    <link rel="stylesheet" href="{% static 'css/account.css' %}">
-    <meta name="description" content="هدخوان، خبرخوان سلیمان. ساخت حساب در سایت">
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "WebPage",
-            "name": "صفحه ساخت حساب کاربری",
-            "description": "در این صفحه حساب کاربری جدیدی بسازید و از امکانات سایت بهره‌مند شوید.",
-            "url": "{{ request.build_absolute_uri }}",
-            "potentialAction": {
-                "@type": "RegisterAction",
-                "target": "{{ request.build_absolute_uri }}",
-                "query-input": "none"
-            }
-        }
-    </script>        
-{% endblock %}
-
 {% block search %}{% endblock %}
 
-{% block content %}
+{% block body %}
     <div class="container">
-        <div class="card">
-            <h1>ساخت حساب</h1>
+        <div class="card no_hover" style="background: transparent">
             <form id="signupForm" method="post">
                 {% csrf_token %}
-                <div>
-                    <label for="{{ form.username.id_for_label }}">نام کاربری</label>
+                <div class="field block">
+                    <h1>ساخت حساب کاربری</h1>
+                    <p>برای دریافت اخبار مرتبط با سلیقه تان و دسترسی به امکانات بیشتر در هدخوان، یک حساب کاربری
+                        بسازید</p>
+                </div>
+                <div class="field block">
+                    <label for="{{ form.username.id_for_label }}">
+                        <b>نام کاربری</b>
+                        <span>متشکل از حروف انگلیسی اعداد، ارقام و خط فاصله</span>
+                    </label>
                     {{ form.username }}
                 </div>
-                <div>
-                    <label for="{{ form.password1.id_for_label }}">رمز عبور</label>
+                <div class="field block">
+                    <label for="{{ form.password1.id_for_label }}">
+                        <b>رمز عبور</b>
+                        <span>یک رمز عبور ایمن و قوی انتخاب کنید</span>
+                    </label>
                     {{ form.password1 }}
-                </div>  
-                <div>
-                    <label for="{{ form.password2.id_for_label }}">تکرار رمز عبور</label>
+                </div>
+                <div class="field block">
+                    <label for="{{ form.password2.id_for_label }}">
+                        <b>تکرار رمز عبور</b>
+                    </label>
                     {{ form.password2 }}
-                </div>  
-                <div>
+                </div>
+                <div class="field block error">
                     {% if status != True %}
-                        <h2 style="color: red;" align="center">{{status}}</h2>
-                        
+                        {{ status }}
                     {% endif %}
                 </div>
-                <button type="submit">ساخت حساب</button>
+                <div class="block">
+                    <button type="submit">ساخت حساب</button>
+                </div>
+                <div class="block">
+                    <div class="signup-link">
+                        <p>از قبل حساب دارید؟ <a href="/account/login">ورود</a></p>
+                    </div>
+                </div>
             </form>
-            <div class="signup-link">
-                <p>از قبل حساب دارید؟ <a href="/accounts/login">ورود</a></p>
-            </div>
         </div>
     </div>
 {% endblock %}

@@ -18,36 +18,49 @@
                 "query-input": "none"
             }
         }
-    </script>        
+    </script>
 {% endblock %}
 
 {% block search %}{% endblock %}
 
-{% block content %}
-<div class="article-content">
-    <div class="card">
-        <h1>ورود</h1>
-        <form id="loginForm" method="post">
-            {% csrf_token %}
-            <div>
-                <label for="{{ form.username.id_for_label }}">نام کاربری</label>
-                {{ form.username }}
-            </div>
-            <div>
-                <label for="{{ form.password.id_for_label }}">رمز عبور</label>
-                {{ form.password }}
-            </div>  
-            <div>
-                {% if status == False %}
-                    <h2 style="color: red;" align="center">نام کاربری یا رمز عبور اشتباه است!</h2>
-                {% endif %}
-            </div>
-            <button type="submit">ورود</button>
-        </form>
-        <div class="signup-link">
-            <p>حساب ندارید؟ <a href="/accounts/signup">ساخت حساب</a></p>
+{% block body %}
+    <div class="article-content">
+        <div class="card no_hover" style="background: transparent">
+            <form id="loginForm" method="post" style="padding-top: 80px">
+                {% csrf_token %}
+                <div class="field block">
+                    <h1>ورود به حساب کاربری</h1>
+                    <p>برای دریافت اخبار مرتبط با سلیقه تان و دسترسی به امکانات بیشتر در هدخوان، وارد حساب کاربری خود
+                        شوید
+                    </p>
+                </div>
+                <div class="field block">
+                    <label for="{{ form.username.id_for_label }}">
+                        <b>نام کاربری</b>
+                    </label>
+                    {{ form.username }}
+                </div>
+                <div class="field block">
+                    <label for="{{ form.password.id_for_label }}">
+                        <b>رمز عبور</b>
+                    </label>
+                    {{ form.password }}
+                </div>
+                <div class="field block error">
+                    {% if status != True %}
+                        {{ status }}
+                    {% endif %}
+                </div>
+                <div class="block">
+                    <button type="submit">ورود به حساب</button>
+                </div>
+                <div class="block">
+                    <div class="signup-link">
+                        <p>حساب ندارید؟ <a href="/account/signup">ورود</a></p>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
-</div>
 {% endblock %}
   

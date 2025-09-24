@@ -58,7 +58,7 @@ def user_login(request):
     return render(request, 'login.html', {'form': form, "status": True})
 
 
-@login_required(login_url='/accounts/login')
+@login_required(login_url='/account/login')
 def user_logout(request):
     logout(request)
     return redirect('/')
@@ -76,7 +76,7 @@ def csrf_failure(requests, reason=""):
     return redirect('/')
 
 
-@login_required(login_url='/accounts/login')
+@login_required(login_url='/account/login')
 def account(requests):
     article = len(Article.objects.all())
     feed = len(Feed.objects.all())
@@ -101,7 +101,7 @@ def account(requests):
     )
 
 
-@login_required(login_url='/accounts/login')
+@login_required(login_url='/account/login')
 def deleteFeed(requests):
     username = requests.user.username
     from pathlib import Path
@@ -120,4 +120,4 @@ def deleteFeed(requests):
         os.remove(f"./../pickles/{username}_MLP.pkl")
         # os.remove(f"./../pickles/{username}_tfidfAbs.pkl")
         # os.remove(f"./../pickles/{username}_tfidfTitle.pkl")
-    return redirect('/accounts/')
+    return redirect('/account/')

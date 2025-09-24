@@ -1,75 +1,46 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}حساب کاربری{% endblock %}
-
-{% block header %}
-    <link rel="stylesheet" href="{% static 'css/account.css' %}">
-    <link rel="stylesheet" href="{% static 'css/personal.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <meta name="description" content="هدخوان، خبرخوان سلیمان. حساب کاربری">
-    <style>
-		.container {
-			max-width: 1500px;
-		}
-	</style>
-{% endblock %}
+{% block title %}نمایه{% endblock %}
 
 {% block search %}{% endblock %}
 
 {% block body %}
-    <h1>سلام {{user.username}}!</h1>
-    <main class="grid2" id="articlesGrid">
-        <div class="card">
-            <div class="card-content">
-                <h1>تعداد کل اخبار</h1>
-                <h2 style="text-align: center;">{{news}} خبر</h2>
+    <div style="text-align: center">
+        <button style="width: fit-content;padding: 0;margin: 0 auto" class="dropbtn fa">
+            <img src="https://ui-avatars.com/api/?name={{ request.user.username }}&size=80">
+        </button>
+        <h1 style="margin-top: 10px;margin-bottom: -5px;font-size: 1.5rem">{{ request.user.username }}</h1>
+        <small style="color: hsl(var(--hsl))">خوش آمدید</small>
+        <p style="margin-bottom: 30px">
+            در بخش نمایه می‌توانید خلاصه‌ای از اطلاعات حساب، آمار فعالیت‌ها و پیشنهادهای شخصی‌سازی‌شده خود را مشاهده و
+            مدیریت کنید.
+        </p>
+    </div>
+    <div id="stats_bar">
+        <div class="card no_hover" r>
+            <div class="block">
+                <h1></h1>
+                <b>تعداد کل بازدید ها</b>
             </div>
         </div>
-        <div class="card">
-            <div class="card-content">
-                <h1>تعداد خبرگذاری‌ها</h1>
-                <h2 style="text-align: center;">{{newsAgency}} خبرگذاری</h2>
+        <div class="card no_hover" r>
+            <div class="block">
+                <h1></h1>
+                <b>تعداد کل لایک ها</b>
             </div>
         </div>
-        <div class="card">
-            <div class="card-content">
-                <h1>اخبار امتیاز داده‌شده</h1>
-                <h2 style="text-align: center;">{{viewed}} خبر</h2>
-                <br>
-                <button onclick="openFn()">
-                    پاک کردن اخبار دیده شده
-                </button>
-        </div>
-    </main>
-    <br>
-    {% if len == 0 %}
-        <h2>شما هیچ آی‌فریمی ندارید!</h2>
-    {% else %}
-        <h2>آی‌فریم های شما:</h2>
-    {% endif %}
-{% endblock %}
-
-{% block main %}
-    {% if len != 0 %}
-        {% for iframe in iframes %}
-            <div class="card">
-                <iframe src="/iframe/{{iframe.token}}"></iframe>
-                <div class="card-content">
-                    <h2>{{iframe.title}}</h2>
-                    <div class="iframeBox">
-                        <button onclick="copy('{{iframe.token}}')" style="flex-grow: 0; border-radius: 1rem;">کپی</button>
-                        <div class="codebox">
-                            <code>   
-                                &lt;iframe src="https://hodkhan.ir/iframe/{{iframe.token}}"&gt; &lt;/iframe&gt;
-                            </code>
-                        </div>
-                    </div>
-                </div>
+        <div class="card no_hover" r>
+            <div class="block">
+                <h1></h1>
+                <b>تعداد فید های دنبال شده</b>
             </div>
-        {% endfor %}
-    {% endif %}
-
+        </div>
+    </div>
+    <ul class="ui_list">
+        <li r>
+        </li>
+    </ul>
     <div id="overlay" class="hidden"></div>
     <div id="popupDialog" class="hidden">
         <p>
@@ -102,7 +73,7 @@
             );
             popDialog.style.opacity =
                 popDialog.style.opacity ===
-                    "1"
+                "1"
                     ? "0"
                     : "1";
 
@@ -110,15 +81,15 @@
 
         function deleteFeed(stat) {
             openFn()
-            if (stat == "yes"){
-                document.location.href='/accounts/deleteFeed';
+            if (stat == "yes") {
+                document.location.href = '/accounts/deleteFeed';
             }
         }
     </script>
     <script>
         function copy(token) {
-            let s = `<iframe src="https://hodkhan.ir/iframe/${token}"></iframe>`    
+            let s = `<iframe src="https://hodkhan.ir/iframe/${token}"></iframe>`
             navigator.clipboard.writeText(s);
         }
-        </script>
+    </script>
 {% endblock %}

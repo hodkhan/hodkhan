@@ -10,45 +10,43 @@
 {% endblock %}
 
 {% block header %}
-    <meta name="description" content="{% if query %}نتایج جستجو برای {{ query }}{% else %}لیست اخبار{% endif %} در هدخوان">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-	<style>
-		.container {
-			max-width: 1500px;
-		}
-	</style>
+    <meta name="description"
+          content="{% if query %}نتایج جستجو برای {{ query }}{% else %}لیست اخبار{% endif %} در هدخوان">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        .container {
+            max-width: 1500px;
+        }
+    </style>
 {% endblock %}
 
 {% block body %}
     {% if query %}
-        <div class="search-results-header">
-            <h2>نتایج جستجو برای "{{ query }}"</h2>
-            <p>{{ count }} خبر یافت شد</p>
-        </div>
-    {% endif %} 
-{% endblock %}
-
-{% block main %}
-    {% for article in news %}
-        <div class="card">
-            <a href="/news/{{article.id}}" target="_blank">
-                <img src="{{article.image}}" alt="{{article.title}}">
-                <div class="card-content">
-                    <div class="info">
-                        <h5 class="topic">{{article.topic}}</h5>
-                        <h5 class="pub">{{article.published}}</h5>
-                    </div>
-                    <h2>{{article.title}}</h2>
-                    <p>{{article.abstract}}</p>
-                    <div class="con-star">
-                        <a href="{{article.link}}" target="_blank">{{article.newsAgency}}</a>
-                        <div class="empty"></div>
-                        <div class="stars" data-article-id="{{article.id}}">
+        <h3>نتایج جستجو برای "{{ query }}"</h3>
+        <p>{{ count }} نتیجه یافت شد</p>
+    {% endif %}
+    <div id="articleGrid" style="padding-top: 20px">
+        {% for article in articles %}
+            <div class="card article" r>
+                <a href="/article/{{ article.id }}" target="_blank">
+                    <div class="article_info card_info block">
+                        <div class="article_feed">
+                            <img class="article_feed_favicon" src="{{ article.feed.favicon }}">
+                            <h5 class="article_feed_name">{{ article.feed.name }}</h5>
                         </div>
+                        <div class="whitespace"></div>
+                        <h5 class="article_pub">{{ article.published }}</h5>
                     </div>
-                </div>
-            </a>
-        </div>
+                    <img class="card_cover" src="{{ article.image }}" alt="{{ article.title }}">
+                    <div class="card_content container block">
+                        <h2 class="article_title">{{ article.title }}؛</h2>
+                        <p class="article_abstract">
+                            {{ article.abstract }}
+                        </p>
+                    </div>
+                </a>
+            </div>
         {% endfor %}
+    </div>
 {% endblock %}
 
