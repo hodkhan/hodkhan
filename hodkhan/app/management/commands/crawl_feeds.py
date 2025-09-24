@@ -1,5 +1,5 @@
+# crawl_feeds.py (Updated version with Gemma embeddings)
 import uuid
-
 import markdownify
 from django.core.management.base import BaseCommand
 
@@ -13,7 +13,8 @@ import re
 import os
 from hazm import Normalizer, word_tokenize
 import pickle
-import fasttext
+# CHANGED: Import GemmaEmbedding instead of fasttext
+from app.management.commands.gemma_embedding import GemmaEmbedding
 
 
 class Command(BaseCommand):
@@ -24,17 +25,29 @@ class Command(BaseCommand):
             '--limit', type=int,
             help='Optional max number of entries per feed to process',
         )
+        # NEW: Added device and batch-size arguments
+        parser.add_argument(
+            '--device', type=str, default='auto',
+            choices=['auto', 'cuda', 'cpu'],
+            help='Device to use for embeddings (auto/cuda/cpu)',
+        )
+        parser.add_argument(
+            '--batch-size', type=int, default=32,
+            help='Batch size for embedding generation',
+        )
 
     def handle(self, *args, **options):
         limit = options.get('limit')
+        device = options.get('device', 'auto')
+        batch_size = options.get('batch_size', 32)
 
         # Load models/vectorizers if available; be tolerant if missing in dev
         vectorizer = None
         model = None
         try:
-            with open('app/management/commands/models/hazm/vectorizer.pkl') as f:
+            with open('app/management/commands/models/hazm/vectorizer.pkl', 'rb') as f:
                 vectorizer = pickle.load(f)
-            with open('app/management/commands/models/hazm/logistic_regression.pkl') as f:
+            with open('app/management/commands/models/hazm/logistic_regression.pkl', 'rb') as f:
                 model = pickle.load(f)
         except Exception:
             self.stdout.write(
@@ -42,15 +55,30 @@ class Command(BaseCommand):
                 'classification will be skipped'
             )
 
-        fasttext_model = None
-        fasttext_model = fasttext.load_model(
-            'app/management/commands/models/fasttext/cc.fa.300.bin'
-        )
+        # CHANGED: Replace fasttext with GemmaEmbedding
+        embedding_model = None
+        try:
+            embedding_model = GemmaEmbedding(
+                model_path='./EmbeddingGemma',
+                device=device,
+                batch_size=batch_size,
+                normalize=True,  # Normalize embeddings like FastText
+                cache_embeddings=True,  # Enable caching for repeated texts
+                seed=42  # For reproducibility
+            )
+            self.stdout.write(f'Loaded Gemma embedding model on device: {embedding_model.device}')
+        except Exception as e:
+            self.stdout.write(
+                f'Warning: Gemma embedding model not available; '
+                f'embedding generation will be skipped. Error: {e}'
+            )
 
         def vectorize_text(text):
-            if not fasttext_model:
+            # CHANGED: Use GemmaEmbedding instead of fasttext
+            if not embedding_model:
                 return None
-            return fasttext_model.get_sentence_vector(text)
+            # Using get_sentence_vector for FastText compatibility
+            return embedding_model.get_sentence_vector(text)
 
         def classifier(text):
             if not vectorizer or not model:
@@ -103,6 +131,10 @@ class Command(BaseCommand):
             return
 
         existing_links = set(Article.objects.values_list('link', flat=True))
+        
+        # NEW: Batch processing for embeddings
+        articles_to_embed = []
+        articles_to_save = []
 
         for feed in feeds:
             self.stdout.write(f'Processing feed: {feed.name} ({feed.address})')
@@ -110,31 +142,19 @@ class Command(BaseCommand):
             entries = parsed.entries
             if limit:
                 entries = entries[:limit]
-            added = 0
+            
             for entry in entries:
                 try:
                     if entry.link in existing_links:
                         continue
                     data = extract_entry_data(entry, feed.name)
-                    # classification/vectorization (best-effort)
+                    
+                    # classification (best-effort)
                     try:
                         classifier(entry.title + "\n" + data['abstract'])
                     except Exception:
                         pass
-                    vec = None
-                    try:
-                        vec = vectorize_text(
-                            entry.title + ' ' + data['abstract']
-                        )
-                    except Exception:
-                        vec = None
-                    vector_str = None
-                    if vec is not None:
-                        if hasattr(vec, 'tolist'):
-                            vector_str = ','.join(map(str, vec.tolist()))
-                        else:
-                            vector_str = ','.join(map(str, vec))
-
+                    
                     # determine a new id: use incrementing numeric id
                     # based on existing max
                     max_id = Article.objects.all().order_by('-id').first()
@@ -142,8 +162,10 @@ class Command(BaseCommand):
                         new_id = str(int(max_id.id) + 1)
                     else:
                         new_id = str(int(time.time()))[:10]
+                    
                     cover = get_cover(entry.link)
                     abstract = clean_caption(entry.summary)
+                    
                     article = Article(
                         id=new_id,
                         title=entry.title,
@@ -152,15 +174,65 @@ class Command(BaseCommand):
                         link=entry.link,
                         published=data['pub_date'],
                         cover=cover,
-                        vector=vector_str,
+                        vector=None,  # Will be set after embedding
                     )
-                    article.save()
-                    existing_links.add(entry.link)
-                    added += 1
-                    self.stdout.write(f'Added: {entry.title}')
+                    
+                    # Collect for batch embedding
+                    articles_to_embed.append((article, entry.title + ' ' + abstract))
+                    articles_to_save.append(article)
+                    
                 except Exception as e:
                     self.stdout.write(f'Error processing entry: {e}')
                     continue
-
-            if added == 0:
-                self.stdout.write(f'No new items for {feed.name}')
+        
+        # NEW: Batch embedding generation
+        if articles_to_embed and embedding_model:
+            self.stdout.write(f'Generating embeddings for {len(articles_to_embed)} articles...')
+            texts = [text for _, text in articles_to_embed]
+            
+            try:
+                # Get embeddings in batch
+                embeddings = embedding_model.get_embeddings(texts)
+                
+                # Assign embeddings to articles
+                for (article, _), embedding in zip(articles_to_embed, embeddings):
+                    if embedding is not None:
+                        if hasattr(embedding, 'tolist'):
+                            vector_str = ','.join(map(str, embedding.tolist()))
+                        else:
+                            vector_str = ','.join(map(str, embedding))
+                        article.vector = vector_str
+            except Exception as e:
+                self.stdout.write(f'Error generating embeddings: {e}')
+                # Fallback to individual embedding generation
+                for article, text in articles_to_embed:
+                    try:
+                        vec = vectorize_text(text)
+                        if vec is not None:
+                            if hasattr(vec, 'tolist'):
+                                vector_str = ','.join(map(str, vec.tolist()))
+                            else:
+                                vector_str = ','.join(map(str, vec))
+                            article.vector = vector_str
+                    except Exception:
+                        pass
+        
+        # Save all articles
+        added = 0
+        for article in articles_to_save:
+            try:
+                article.save()
+                existing_links.add(article.link)
+                added += 1
+                self.stdout.write(f'Added: {article.title}')
+            except Exception as e:
+                self.stdout.write(f'Error saving article: {e}')
+        
+        if added == 0:
+            self.stdout.write('No new items added')
+        else:
+            self.stdout.write(f'Successfully added {added} articles')
+            
+        # NEW: Clear embedding cache to free memory
+        if embedding_model:
+            embedding_model.clear_cache()
