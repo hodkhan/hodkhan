@@ -57,7 +57,7 @@ class Interaction(models.Model):
                                 blank=True)
     type = models.CharField(max_length=20, choices=INTERACTION_TYPES, default="view")
     value = models.TextField(null=True, blank=True)
-    star = models.IntegerField(null=True, blank=True, default=0)
+    # star = models.IntegerField(null=True, blank=True, default=0)
     is_trained = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 

@@ -1,7 +1,7 @@
 import markdownify
 import markdown
 from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
-from .models import Article, Keyword, Feed
+from .models import Article, Keyword, Feed, Interaction
 from django.shortcuts import render, redirect
 from django.db.models import Q
 import pandas as pd
@@ -142,18 +142,6 @@ def stream_articles(request, username, count=0):
 
     response = regressor(x)
     return JsonResponse({'result': response})
-
-
-def articleRating(request):
-    result = dict(request.GET)
-    n = float(result["result[n]"][0])
-    id = result["result[id]"][0]
-    if request.user.is_authenticated:
-        username = request.user.username
-    else:
-        return JsonResponse({"404": "User Not Found"})
-    record(username, id, n)
-    return JsonResponse({})
 
 
 def dbToDjango(requests):
@@ -332,3 +320,39 @@ def getArticleContentView(request, url):
     html_content = fetch_and_process_html(url)
     html_content.strip()
     return html_content
+
+def interaction(request):
+    result = dict(request.GET)
+    if request.user.is_authenticated:
+        user = request.user
+    else:
+        return JsonResponse({"404":"User Not Found"})
+    
+
+    try:
+        type_req = result["result[type]"][0]
+        if type_req == "view":
+            article = Article.objects.get(id=result["result[article]"][0])
+            value = float(result["result[value]"][0])
+            interaction = Interaction(article=article, user=user, type="view", value=value)
+            interaction.save()
+        elif type_req == "like":
+            article = Article.objects.get(id=result["result[article]"][0])
+            interaction = Interaction(article=article, user=user, type="like")
+            interaction.save() 
+        elif type_req == "comment":
+            pass
+        elif type_req == "archive":
+            pass
+        elif type_req == "follow":
+            pass
+        else:
+            return JsonResponse({"404": "Type Not Found"})
+    except Exception as e:
+        print("Error:", e)
+        return JsonResponse({"400": "Bad Request"})
+    
+    return JsonResponse({"200": "OK"})
+    # id = result["result[id]"][0]
+    # n = float(result["result[n]"][0])
+    # record(username, id, n)
