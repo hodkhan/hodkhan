@@ -20,76 +20,25 @@
     <div id="stats_bar">
         <div class="card no_hover" r>
             <div class="block">
-                <h1></h1>
                 <b>تعداد کل بازدید ها</b>
+                <h1>{{viewed}}</h1>
             </div>
         </div>
         <div class="card no_hover" r>
             <div class="block">
-                <h1></h1>
                 <b>تعداد کل لایک ها</b>
+                <h1>{{liked}}</h1>
             </div>
         </div>
         <div class="card no_hover" r>
             <div class="block">
-                <h1></h1>
                 <b>تعداد فید های دنبال شده</b>
+                <h1></h1>
             </div>
         </div>
-    </div>
-    <ul class="ui_list">
-        <li r>
-        </li>
-    </ul>
-    <div id="overlay" class="hidden"></div>
-    <div id="popupDialog" class="hidden">
-        <p>
-            آیا مطمئنید میخواهید اطلاعات مربوط به اخبار دیده شده را پاک کنید؟
-        </p>
-        <button onclick="deleteFeed('yes')">
-            بله
-        </button>
-        <button onclick="deleteFeed('no')">
-            خیر
-        </button>
     </div>
 {% endblock %}
 
 {% block scripts %}
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        function openFn() {
-            const over =
-                document.getElementById(
-                    "overlay"
-                );
-            const popDialog =
-                document.getElementById(
-                    "popupDialog"
-                );
-            over.classList.toggle("hidden");
-            popDialog.classList.toggle(
-                "hidden"
-            );
-            popDialog.style.opacity =
-                popDialog.style.opacity ===
-                "1"
-                    ? "0"
-                    : "1";
-
-        }
-
-        function deleteFeed(stat) {
-            openFn()
-            if (stat == "yes") {
-                document.location.href = '/accounts/deleteFeed';
-            }
-        }
-    </script>
-    <script>
-        function copy(token) {
-            let s = `<iframe src="https://hodkhan.ir/iframe/${token}"></iframe>`
-            navigator.clipboard.writeText(s);
-        }
-    </script>
 {% endblock %}

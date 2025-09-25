@@ -86,17 +86,23 @@ def account(requests):
     q = (
         "SELECT i.article_id FROM app_interaction i "
         "LEFT JOIN auth_user u ON i.user_id = u.id "
-        "WHERE u.username = ? AND i.type = 'view'"
+        "WHERE u.username = ? AND i.type = 'read' OR i.type = 'view'"
     )
     viewed = conn.execute(q, (requests.user.username,))
     viewed = len(viewed.fetchall())
+    q = (
+        "SELECT i.article_id FROM app_interaction i "
+        "LEFT JOIN auth_user u ON i.user_id = u.id "
+        "WHERE u.username = ? AND i.type = 'like'"
+    )
+    liked = conn.execute(q, (requests.user.username,))
+    liked = len(liked.fetchall())
     return render(
         requests,
         "account.html",
         context={
-            "article": article,
-            "feed": feed,
             "viewed": viewed,
+            "liked": liked
         },
     )
 
