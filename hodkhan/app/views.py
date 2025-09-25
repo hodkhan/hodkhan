@@ -345,6 +345,11 @@ def interaction(request):
             value = float(result["result[value]"][0])
             interaction = Interaction(article=article, user=user, type="view", value=value)
             interaction.save()
+        elif type_req == "read":
+            article = Article.objects.get(id=result["result[article]"][0])
+            value = float(result["result[value]"][0])
+            interaction = Interaction(article=article, user=user, type="read", value=value)
+            interaction.save()
         elif type_req == "like":
             article = Article.objects.get(id=result["result[article]"][0])
             interaction = Interaction(article=article, user=user, type="like")

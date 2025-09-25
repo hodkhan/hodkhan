@@ -42,6 +42,7 @@ class Article(models.Model):
 class Interaction(models.Model):
     INTERACTION_TYPES = [
         ("view", "View"),
+        ("read", "Read"),
         ("like", "Like"),
         ("comment", "Comment"),
         ("archive", "Archive"),
