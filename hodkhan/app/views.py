@@ -4,6 +4,7 @@ from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
 from .models import Article, Keyword, Feed, Interaction
 from django.shortcuts import render, redirect
 from django.db.models import Q
+from pathlib import Path
 import pandas as pd
 import numpy as np
 import jdatetime
@@ -79,7 +80,11 @@ def stream_articles(request, username, count=0):
 
     try:
         # Load the trained model
-        with open(f'../pickles/{username}_MLP.pkl', 'rb') as f:
+        # Ensure the pickles directory exists before saving the model
+        pickles_dir = Path(__file__).resolve().parent.parent / 'pickles'
+        pickles_dir.mkdir(parents=True, exist_ok=True)
+
+        with open(pickles_dir / f'{username}_MLP.pkl', 'rb') as f:
             mlp = pickle.load(f)
         flag = False
     except:
