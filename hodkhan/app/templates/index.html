@@ -33,7 +33,7 @@
         .like_btn {
             position: absolute;
             bottom: 15px;
-            left: 15px;
+            right: 15px;
             z-index: 2;
             cursor: pointer;
             display: flex;
@@ -116,6 +116,7 @@
         }
 
         function renderArticles(category = 'all') {
+            console.log(articles)
             const grid = document.getElementById('articlesGrid');
             grid.innerHTML = '';
             articles.forEach(article => {
@@ -164,33 +165,19 @@
 
         document.getElementById('articlesGrid').addEventListener('click', handleStarClick);
 
-        {% comment %} function start() {
-            console.log(`/api/stream-articles/${i}`);
-            fetch(`/api/stream-articles/{{username}}/${i}`)
-            .then response => response.json())
-            .then(data => {
-                console.log(data.result)
-                articles = data.result
-                renderArticles();
-                i ++
-            });
-        } {% endcomment %}
 
-
-        let isFetching = true;
-
-        window.addEventListener('scroll', () => {
+        {% comment %} window.addEventListener('scroll', () => {
             if (window.innerHeight + window.scrollY + 500 >= document.body.offsetHeight && !isFetching) {
                 isFetching = true;
                 start();
             }
-        });
+        }); {% endcomment %}
 
         function start() {
             fetch(`/api/feed/{{username}}/${i}`)
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('articlesGridLoading').remove()
+                    console.log(data)
                     if (data.result.length > 0) {
                         articles = data.result;
                         renderArticles();
@@ -201,6 +188,7 @@
                 .catch(() => {
                     isFetching = false;
                 });
+            document.getElementById('articlesGridLoading').remove()
         }
 
         start();
@@ -209,7 +197,6 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const signupConsent = document.getElementById('signup-consent');
-            const exitBtn = document.getElementById('exit-signup');
 
 
             function showSignupConsent() {
@@ -224,9 +211,6 @@
                 }
             }
 
-            exitBtn.addEventListener('click', function () {
-                signupConsent.style.display = 'none';
-            });
 
             checkSignupConsent();
         });
@@ -260,11 +244,6 @@
             });
         }
 
-        for (let i = 0; i < 5; i++) {
-            setTimeout(() => {
-                viewArticle(id, 2)
-            }, 5000)
-        }
 
         function toggleFollow(feedId, button) {
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
