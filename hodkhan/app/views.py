@@ -1,7 +1,7 @@
 import markdownify
 import markdown
 from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
-from .models import Article, Keyword, Feed, Interaction
+from .models import Article, Keyword, Feed, Interaction, UserFeed
 from django.shortcuts import render, redirect
 from django.db.models import Q
 from pathlib import Path
@@ -16,6 +16,7 @@ import pytz
 import json
 import sys
 import os
+from django.contrib.auth.decorators import login_required
 
 module_path = os.path.abspath("feed_creator/")
 sys.path.append(module_path)
@@ -40,6 +41,21 @@ def privacy(requests):
     else:
         username = "sampleUser"
     return render(requests, "privacy.html", context={"username": username})
+
+
+@login_required
+def account(request):
+    user = request.user
+    viewed_count = Interaction.objects.filter(user=user, type='view').count()
+    liked_count = Interaction.objects.filter(user=user, type='like').count()
+    followed_feeds_count = UserFeed.objects.filter(user=user).count()
+
+    context = {
+        'viewed': viewed_count,
+        'liked': liked_count,
+        'followed_feeds': followed_feeds_count,
+    }
+    return render(request, "account.html", context)
 
 
 def article(requests, id):
@@ -93,6 +109,11 @@ def stream_articles(request, username, count=0):
 
     print('loading pickles:', time.time() - start)
 
+    if request.user.is_authenticated:
+        followed_feed_ids = set(UserFeed.objects.filter(user=request.user).values_list('feed_id', flat=True))
+    else:
+        followed_feed_ids = set()
+
     oldarticle = Article.objects.filter(published__gte=int(time.time()) - 86400)
 
     larticle = []
@@ -139,6 +160,7 @@ def stream_articles(request, username, count=0):
                 list(map(lambda x: x in "1234567890" and "۰۱۲۳۴۵۶۷۸۹"[int(x)] or x, n["published"])))
             n["image"] = thearticle.cover
             n["link"] = thearticle.link
+            n["is_following"] = thearticle.feed.id in followed_feed_ids
             if flag:
                 n['stars'] = 0
             else:
@@ -327,6 +349,34 @@ def search(request):
         "query": query,
         "count": str(len(allArticle)).translate(str.maketrans('0123456789','۰۱۲۳۴۵۶۷۸۹'))
     })
+
+
+def follow_feed(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Authentication required'}, status=401)
+
+    try:
+        data = json.loads(request.body)
+        feed_id = data.get('feed_id')
+        if not feed_id:
+            return JsonResponse({'error': 'feed_id is required'}, status=400)
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+    try:
+        feed = Feed.objects.get(id=feed_id)
+    except Feed.DoesNotExist:
+        return JsonResponse({'error': 'Feed not found'}, status=404)
+
+    user_feed, created = UserFeed.objects.get_or_create(user=request.user, feed=feed)
+
+    if created:
+        # User is now following the feed
+        return JsonResponse({'status': 'followed', 'feed_id': feed_id})
+    else:
+        # User was already following, so unfollow
+        user_feed.delete()
+        return JsonResponse({'status': 'unfollowed', 'feed_id': feed_id})
 
 
 def getArticleContentView(request, url):

@@ -39,6 +39,19 @@ class Article(models.Model):
         return self.title
 
 
+class UserFeed(models.Model):
+    id = models.CharField(max_length=15, primary_key=True, default=uuid4, editable=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    feed = models.ForeignKey(Feed, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'feed')
+
+    def __str__(self):
+        return f"{self.user.username} follows {self.feed.name}"
+
+
 class Interaction(models.Model):
     INTERACTION_TYPES = [
         ("view", "View"),
@@ -68,3 +81,4 @@ class Interaction(models.Model):
     def __str__(self):
         user = self.user.username if self.user else "anonymous"
         return f"{user}: {self.type} {self.article_id if self.article_id else ''}"
+

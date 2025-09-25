@@ -5,9 +5,43 @@
 
 {% block header %}
     <meta name="description" content="هدخوان، خبرخوان سلیمان. خبرهای مورد علاقه خود را با هدخوان پیدا کنید">
+    <meta name="csrf-token" content="{{ csrf_token }}">
     <style>
         .container {
             max-width: 1500px;
+        }
+        .card.article {
+            position: relative;
+            padding-bottom: 50px; /* Add padding to the bottom of the card */
+        }
+        .article_feed {
+            display: flex;
+            align-items: center;
+        }
+        .follow_btn {
+            /* position: absolute; */
+            /* top: 15px; */
+            /* right: 15px; */
+            /* z-index: 2; */
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            margin-left: 10px; /* Add margin to the left of the button */
+        }
+        .like_btn {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            z-index: 2;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            background: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
     </style>
     <script type="application/ld+json">
@@ -51,14 +85,16 @@
         let messageCount = 0;
 
         function createArticleCard(article) {
+            let followButtonText = article.is_following ? 'دنبال شده' : 'دنبال کردن';
+            let followButtonClass = article.is_following ? 'following' : '';
             let card = `
-<div>
-            <div class="card article" r>
+            <div class="card article">
 				<a href="/article/${article.id}" target="_blank">
 				    <div class="article_info card_info block">
                         <div class="article_feed">
                             <img class="article_feed_favicon" src="${article.feed.favicon}">
 				    	    <h5 class="article_feed_name">${article.feed.name}</h5>
+                            <button class="follow_btn ${followButtonClass}" onclick="event.preventDefault(); event.stopPropagation(); toggleFollow('${article.feed.id}', this)">${followButtonText}</button>
                         </div>
                         <div class="whitespace"></div>
 						<h5 class="article_pub">${article.published}</h5>
@@ -70,13 +106,11 @@
                         </p>
 					</div>
 				</a>
-
-            </div>
-<div class="like_btn" onclick="likeArticle('${article.id}',this)" >
-<img style="width: 20px" draggable="false"src="https://em-content.zobj.net/source/apple/81/heavy-black-heart_2764.png">
-    <div style="display: inline-block;margin-top: 2px;transition: ;font-size: .9rem;color: red">پسند</div>
+                <div class="like_btn" onclick="likeArticle('${article.id}',this)" >
+                    <img style="width: 20px" draggable="false"src="https://em-content.zobj.net/source/apple/81/heavy-black-heart_2764.png">
+                    <div style="display: inline-block; margin-right: 5px; font-size: .9rem; color: red">پسند</div>
                 </div>
-</div>
+            </div>
 			`;
             return card;
         }
@@ -133,7 +167,7 @@
         {% comment %} function start() {
             console.log(`/api/stream-articles/${i}`);
             fetch(`/api/stream-articles/{{username}}/${i}`)
-            .then(response => response.json())
+            .then response => response.json())
             .then(data => {
                 console.log(data.result)
                 articles = data.result
@@ -230,6 +264,34 @@
             setTimeout(() => {
                 viewArticle(id, 2)
             }, 5000)
+        }
+
+        function toggleFollow(feedId, button) {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            fetch('/api/follow_feed/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                },
+                body: JSON.stringify({feed_id: feedId}),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'followed') {
+                    button.textContent = 'دنبال شده';
+                    button.classList.add('following');
+                } else if (data.status === 'unfollowed') {
+                    button.textContent = 'دنبال کردن';
+                    button.classList.remove('following');
+                } else if (data.error) {
+                    console.error('Error:', data.error);
+                    if (data.error === 'Authentication required') {
+                        alert('برای دنبال کردن باید وارد شوید.');
+                    }
+                }
+            })
+            .catch(error => console.error('Error:', error));
         }
 
         function followFeed(id) {
