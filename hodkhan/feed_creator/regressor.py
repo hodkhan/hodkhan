@@ -97,7 +97,7 @@ def regression():
     # We'll produce a DataFrame with columns: username, newsId, star, isTrained
     interactions_q = (
         "SELECT i.id, u.username as username, i.article_id as newsId, "
-        "i.star as star, i.is_trained as isTrained, i.type as type, i.value as value, i.created_at as created, n.vector "  # Removed 'cc'
+        "i.is_trained as isTrained, i.type as type, i.value as value, i.created_at as created, n.vector "  # Removed 'cc'
         "FROM app_interaction i "
         "LEFT JOIN auth_user u ON i.user_id = u.id "
         "LEFT JOIN app_article n ON i.article_id = n.id "
