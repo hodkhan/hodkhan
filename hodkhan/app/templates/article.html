@@ -107,7 +107,7 @@
 
         window.addEventListener("beforeunload", () => {
             stopTimer();
-            viewArticle("{{ article.id }}",Math.round(totalActiveTime / 1000));
+            viewArticle("{{ article.id }}",totalActiveTime);
         });
 
         function followFeed(id) {
