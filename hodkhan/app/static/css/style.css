@@ -432,11 +432,32 @@ header a:hover {
 button.fa {
     border-radius: 100%;
     aspect-ratio: 1 / 1;
-    display: flex;
+    display: flex !important;
     align-items: center;
     padding: 20px;
     justify-content: center;
 }
+
+.like_btn {
+    transition: .2s;
+    width: fit-content;
+    line-height: 14px;
+    opacity: .4;
+    cursor: pointer;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+.like_btn:hover {
+    opacity: 1;
+}
+
+.like_btn:active {
+    opacity: 1;
+    filter: brightness(80%);
+    transform: scale(.8);
+}
+
 
 .article_feed_favicon {
     width: 30px;
@@ -1079,6 +1100,12 @@ form button {
     width: 100%;
 }
 
+#dd {
+    pointer-events: none;
+    position: absolute;
+    opacity: 0;
+}
+
 @media screen and (max-width: 1180px) {
     .page {
         width: 100%;
@@ -1086,7 +1113,10 @@ form button {
     }
 
     .mobile {
-        display: block!important;
+        display: block !important;
+        pointer-events: all !important;
+        opacity: 1 !important;
+        position: unset!important;
     }
 
     #mobile_nav {

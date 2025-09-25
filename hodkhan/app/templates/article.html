@@ -40,7 +40,8 @@
             </li>
         </ul>
         {% if user.is_authenticated %}
-            <button class="fa" id="like_btn" onclick="likeArticle('{{ article.id }}');this.remove();alert('لایک با موفقیت ثبت شد','3d',2000)">
+            <button class="fa" id="like_btn"
+                    onclick="likeArticle('{{ article.id }}',el);">
                 <img src="https://em-content.zobj.net/source/apple/81/heavy-black-heart_2764.png">
             </button>
         {% endif %}
@@ -49,7 +50,7 @@
 
 {% block scripts %}
     <script>
-        function likeArticle(id) {
+        function likeArticle(id, el) {
             $.ajax({
                 type: "GET",
                 url: '/api/interaction',
@@ -58,9 +59,14 @@
                 },
                 dataType: "json",
             });
+            el.remove();
+            alert(`
+            <div style="text-align: center">
+            لایک با موفقیت ثبت شد
+            </div>`, '3d', 3000)
         }
 
-        function viewArticle(id,value) {
+        function viewArticle(id, value) {
             $.ajax({
                 type: "GET",
                 url: '/api/interaction',
@@ -72,10 +78,11 @@
         }
 
         for (let i = 0; i < 5; i++) {
-            setTimeout(()=>{
-                viewArticle(id,2)
-            },5000)
+            setTimeout(() => {
+                viewArticle(id, 2)
+            }, 5000)
         }
+
         function followFeed(id) {
             $.ajax({
                 type: "GET",

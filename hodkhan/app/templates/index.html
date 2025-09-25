@@ -52,6 +52,7 @@
 
         function createArticleCard(article) {
             let card = `
+<div>
             <div class="card article" r>
 				<a href="/article/${article.id}" target="_blank">
 				    <div class="article_info card_info block">
@@ -69,7 +70,13 @@
                         </p>
 					</div>
 				</a>
+
             </div>
+<div class="like_btn" onclick="likeArticle('${article.id}',this)" >
+<img style="width: 20px" draggable="false"src="https://em-content.zobj.net/source/apple/81/heavy-black-heart_2764.png">
+    <div style="display: inline-block;margin-top: 2px;transition: ;font-size: .9rem;color: red">پسند</div>
+                </div>
+</div>
 			`;
             return card;
         }
@@ -189,5 +196,52 @@
 
             checkSignupConsent();
         });
+
+        function likeArticle(id, el) {
+            $.ajax({
+                type: "GET",
+                url: '/api/interaction',
+                data: {
+                    "result": {"type": "like", "article": id, "value": "2.5"},
+                },
+                dataType: "json",
+            });
+            el.remove();
+            alert(`
+            <div style="text-align: center">
+            لایک با موفقیت ثبت شد
+            </div>`, '3d', 3000)
+
+        }
+
+
+        function viewArticle(id, value) {
+            $.ajax({
+                type: "GET",
+                url: '/api/interaction',
+                data: {
+                    "result": {"type": "view", "article": id, "value": value},
+                },
+                dataType: "json",
+            });
+        }
+
+        for (let i = 0; i < 5; i++) {
+            setTimeout(() => {
+                viewArticle(id, 2)
+            }, 5000)
+        }
+
+        function followFeed(id) {
+            $.ajax({
+                type: "GET",
+                url: '/api/interaction',
+                data: {
+                    "result": {"type": "follow", "feed": id, "value": "5"},
+                },
+                dataType: "json",
+            });
+        }
+
     </script>
 {% endblock %}
