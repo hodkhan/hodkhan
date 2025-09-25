@@ -1104,6 +1104,7 @@ form button {
     pointer-events: none;
     position: absolute;
     opacity: 0;
+    overflow: hidden!important;
 }
 
 @media screen and (max-width: 1180px) {
@@ -1116,7 +1117,7 @@ form button {
         display: block !important;
         pointer-events: all !important;
         opacity: 1 !important;
-        position: unset!important;
+        position: unset !important;
     }
 
     #mobile_nav {
@@ -1178,5 +1179,26 @@ form button {
 
     .page.active {
         display: block;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .grid {
+        display: block;
+    }
+
+    #mainpage .block:has(#articlesGrid) {
+        padding: 0;
+    }
+
+    .card.article {
+        transform: unset !important;
+        box-shadow: unset !important;
+        border-radius: unset;
+        border-bottom: rgb(0, 0, 0, .2) solid 1px;
+        background: unset !important;
+    }
+    .like_btn{
+        margin-right: 20px;
     }
 }
