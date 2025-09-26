@@ -14,6 +14,125 @@
     <script src="{% static 'js/ripple.js' %}"></script>
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <link rel="shortcut icon" href="{% static 'images/logo.png' %}">
+    <style>
+        #mobile_sidebar_container {
+            display: none;
+            z-index: 1000 !important;
+        }
+
+        #dd {
+            display: none !important;
+        }
+
+        @media (max-width: 700px) {
+            #dd {
+                display: flex !important;
+            }
+
+            .like_btn {
+                margin-right: 0px;
+            }
+
+            #mobile_sidebar_container {
+                display: block;
+                position: fixed;
+                top: 0;
+                right: 0;
+                width: 280px;
+                height: 100%;
+                background: #F0EEF6;
+                box-shadow: -2px 0 8px rgba(0,0,0,0.2);
+                transform: translateX(100%);
+                transition: transform 0.3s ease-in-out;
+                z-index: 1000 !important;
+            }
+
+            #mobile_sidebar_container.active {
+                transform: translateX(0);
+            }
+
+            #sidebar_overlay {
+                display: block; 
+            }
+
+            #sidebar_overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                opacity: 0;
+                visibility: hidden;
+                transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+                z-index: 900;
+            }
+
+            #sidebar_overlay.active {
+                opacity: 1;
+                visibility: visible;
+            }
+
+            .page_container {
+                position: relative;
+            }
+
+            #mobile_header {
+                display: flex;
+                align-items: flex-start;
+                justify-content: center;
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .mobile_header_top {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+                margin-bottom: 20px;
+            }
+
+            header a {
+                margin-right: 0;
+            }
+            
+            #logo {
+                margin-right: 0;
+            }
+
+            #mobile_sidebar_container li a {
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                gap: 10px;
+                margin-right: 10px;
+            }
+
+            #mobile_sidebar_container li:last-child {
+                background: #fff;
+                border-radius: 10px;
+                width: 90%;
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+
+            }
+
+            #search-dropdown {
+                position: absolute;
+                top: 100%;
+                right: -40px;
+                background: var(--card);
+                border-radius: var(--radius);
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                max-height: calc(100vh - 200px);
+                display: none;
+                width: 111%;
+                z-index: 1000;
+            }
+        }
+    </style>
     {% block header %}
     {% endblock %}
 </head>
@@ -93,12 +212,41 @@
                                         <button r type="submit" class="input_button fa fa-search"></button>
                                     </form>
                                     <div class="card" id="search-dropdown"></div>
-                                    <button id="dd" style="margin-right: 10px;background: hsl(var(--hsl),.2);color: hsl(var(--hsl));--r:hsl(var(--hsl))"
-                                            r
-                                            type="submit" class="mobile fa fa-bars"></button>
+                                    <button id="dd" type="button" style="margin-right: 10px;background: hsl(var(--hsl),.2);color: hsl(var(--hsl));--r:hsl(var(--hsl))"
+                                            class="mobile fa fa-bars"></button>
                                 </div>
                             {% endblock %}
                         {% endblock %}
+                    </div>
+                </div>
+                <div id="mobile_sidebar_container">
+                    <div class="page sidebar block">
+                        <header id="mobile_header">
+                            <div class="mobile_header_top">
+                                <a href="/"><img id="logo" src="{% static 'images/logo.png' %}"></a>
+                                {% if user.is_authenticated %}
+                                    <a href="/account">
+                                        <button id="account_button" class="dropbtn fa">
+                                            <img src="https://ui-avatars.com/api/?name={{ request.user.username }}&size=40">
+                                        </button>
+                                    </a>
+                                {% endif %}
+                            </div>
+                            <a href="/"><h2>هدخوان</h2></a>
+                            <p style="margin-top: -5px">خبرخوان هوشمند فارسی</p>
+                        </header>
+                        <ul class="sidebar_footer ui_list">
+                            {% if user.is_authenticated %}
+                                <li><a href="{% url 'account' %}"><i class="fa fa-user"></i> پروفایل</a></li>
+                                {% if user.is_staff %}
+                                    <li><a href="/admin"><i class="fa fa-gear"></i> ادمین</a></li>
+                                {% endif %}
+                                <li><a href="{% url 'logout' %}"><i class="fa fa-right-to-bracket"></i> خروج</a></li>
+                            {% else %}
+                                <li><a href="{% url 'signup' %}"><i class="fa fa-user"></i> ثبت نام</a></li>
+                                <li><a href="{% url 'login' %}"><i class="fa fa-right-to-bracket"></i> ورود</a></li>
+                            {% endif %}
+                        </ul>
                     </div>
                 </div>
                 <div class="block container">
@@ -260,6 +408,43 @@
             });
         });
     </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const menuBtn = document.getElementById("dd");
+            const mobileSidebar = document.getElementById("mobile_sidebar_container");
+            const overlay = document.getElementById("sidebar_overlay");
+
+            function openSidebar() {
+                mobileSidebar.classList.add("active");
+                overlay.classList.add("active");
+            }
+
+            function closeSidebar() {
+                mobileSidebar.classList.remove("active");
+                overlay.classList.remove("active");
+            }
+
+            menuBtn.addEventListener("click", function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                if (mobileSidebar.classList.contains("active")) {
+                    closeSidebar();
+                } else {
+                    openSidebar();
+                }
+            });
+
+            overlay.addEventListener("click", closeSidebar);
+
+            document.addEventListener("click", function (e) {
+                if (!mobileSidebar.contains(e.target) && e.target !== menuBtn) {
+                    closeSidebar();
+                }
+            });
+        });
+    </script>
 </div>
+<div id="sidebar_overlay"></div>
 </body>
 </html>
