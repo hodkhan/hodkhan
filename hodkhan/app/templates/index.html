@@ -78,6 +78,7 @@
 
 {% block scripts %}
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jalaali-js/dist/jalaali.min.js"></script>
     <script>
         let articles = [];
         let i = 0;
@@ -97,7 +98,7 @@
                             <button class="follow_btn ${followButtonClass}" onclick="event.preventDefault(); event.stopPropagation(); toggleFollow('${article.feed.id}', this)">${followButtonText}</button>
                         </div>
                         <div class="whitespace"></div>
-						<h5 class="article_pub">${article.published}</h5>
+						<h5 class="article_pub">${timeAgo(article.published)}</h5>
                     </div>
 					<img class="card_cover" src="${article.image}" alt="${article.title}">
 					<div class="card_content container block">
@@ -284,5 +285,33 @@
             });
         }
 
+    </script>
+
+    <script>
+        function toEnglishDigits(str) {
+            return str.replace(/[۰-۹]/g, d => "۰۱۲۳۴۵۶۷۸۹".indexOf(d));
+        }
+
+        function parseJalali(persianDateString) {
+            let eng = toEnglishDigits(persianDateString); 
+            let [date, time] = eng.split(" ");
+            let [jy, jm, jd] = date.split("-").map(Number);
+            let [hh, mm, ss] = time.split(":").map(Number);
+
+            let g = jalaali.toGregorian(jy, jm, jd);
+
+            return new Date(g.gy, g.gm - 1, g.gd, hh, mm, ss);
+        }
+
+        function timeAgo(persianDateString) {
+            let publishedDate = parseJalali(persianDateString);
+            const now = new Date();
+            const diffInSeconds = Math.floor((now - publishedDate) / 1000);
+
+            if (diffInSeconds < 60) return "همین الان";
+            if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} دقیقه قبل`;
+            if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} ساعت قبل`;
+            return `${Math.floor(diffInSeconds / 86400)} روز قبل`;
+        }
     </script>
 {% endblock %}
