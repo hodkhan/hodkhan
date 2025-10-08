@@ -1,8 +1,10 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status
 from rest_framework.pagination import PageNumberPagination 
 from django.db.models import Q
-from .models import KeyWordTable
+from django.db import transaction
+from .models import KeyWordTable, SearchKeyWord
 
 from app.models import Article
 from rest_framework.authentication import BaseAuthentication
@@ -33,6 +35,7 @@ def convert_timestamp_to_jalali(timestamp):
     )
     return jdt.strftime("%Y-%m-%d %H:%M:%S") 
 
+# Agency authentication
 class APIKeyAuthentication(BaseAuthentication):
     def authenticate(self, request):
         key = request.headers.get('Authentication')
@@ -45,8 +48,9 @@ class APIKeyAuthentication(BaseAuthentication):
         except AgencyKey.DoesNotExist:
             raise AuthenticationFailed('Invalid API key')
 
+# Search Key words
 class GetFeedView(APIView):
-    authentication_classes = [APIKeyAuthentication]
+    authentication_classes = [APIKeyAuthentication] # Authentication via APIKeyAuth class
     def get(self, request):
         agency = request.user
 
@@ -86,3 +90,56 @@ class GetFeedView(APIView):
             return paginator.get_paginated_response({"articles": data})
         except KeyWordTable.DoesNotExist:
             return Response({"error": "User not found"}, status=404)
+
+
+# Append Key words for a user
+class AddKeywordsView(APIView):
+    authentication_classes = [APIKeyAuthentication]
+
+    def post(self, request):
+        agency = request.user
+        keywords_str = request.data.get('keywords', '').strip()
+
+        if not keywords_str:
+            return Response(
+                {"error": "Missing 'keywords' field (comma-separated string)"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        keyword_list = [kw.strip() for kw in keywords_str.split(',') if kw.strip()]
+        if not keyword_list:
+            return Response(
+                {"error": "No valid keywords provided"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        for kw in keyword_list:
+            if len(kw) > 100:
+                return Response(
+                    {"error": f"Keyword too long: '{kw}' (max 100 chars)"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+        try:
+            keyword_table, created = KeyWordTable.objects.get_or_create(agency=agency)
+
+            with transaction.atomic():
+                created_words = []
+                for word in keyword_list:
+                    obj, created = SearchKeyWord.objects.get_or_create(text=word)
+                    if created:
+                        created_words.append(word)
+                    keyword_table.words.add(obj)
+
+            return Response({
+                "message": "Keywords added successfully",
+                "total_keywords_added": len(keyword_list),
+                "newly_created_words": created_words,
+                "agency": agency.name
+            }, status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response(
+                {"error": "Failed to add keywords", "detail": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
