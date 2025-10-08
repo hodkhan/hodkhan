@@ -1,6 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.pagination import PageNumberPagination 
 from django.db.models import Q
 from .models import KeyWordTable
 
@@ -63,9 +63,12 @@ class GetFeedView(APIView):
                 query |= Q(title__icontains=word) | Q(abstract__icontains=word)
 
             articles = Article.objects.filter(query)
+            paginator = PageNumberPagination()
+            paginated_articles = paginator.paginate_queryset(articles, request)
 
+            # Serialize data
             data = []
-            for a in articles:
+            for a in paginated_articles:
                 published_jalali = None
                 if a.published is not None:
                     try:
@@ -80,6 +83,6 @@ class GetFeedView(APIView):
                     "cover": a.cover,
                     "published": published_jalali
                 })
-            return Response({"articles": data})
+            return paginator.get_paginated_response({"articles": data})
         except KeyWordTable.DoesNotExist:
             return Response({"error": "User not found"}, status=404)
