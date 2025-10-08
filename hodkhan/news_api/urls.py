@@ -3,5 +3,5 @@ from .views import GetFeedView, AddKeywordsView
 
 urlpatterns = [
     path('get_feed/', GetFeedView.as_view()),
-    path('keywords/add/', AddKeywordsView.as_view(), name='add-keywords'),
+    path('add_keywords/', AddKeywordsView.as_view(), name='add-keywords'),
 ]
