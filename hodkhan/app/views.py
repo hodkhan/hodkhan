@@ -21,8 +21,6 @@ from django.contrib.auth.decorators import login_required
 module_path = os.path.abspath("feed_creator/")
 sys.path.append(module_path)
 
-from main import record
-
 
 def index(requests):
     if requests.user.is_authenticated:

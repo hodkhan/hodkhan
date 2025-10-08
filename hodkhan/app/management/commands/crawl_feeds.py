@@ -131,12 +131,12 @@ class Command(BaseCommand):
             }
 
         # Set up signal handler
-        signal.signal(signal.SIGALRM, timeout_handler)
+        signal.signal(signal.SIGABRT, timeout_handler)
 
         while True:
             try:
                 self.stdout.write('Crawler is running...')
-                signal.alarm(timeout)  # Set timeout for this cycle
+                # signal.alarm(timeout)  # Set timeout for this cycle
 
                 existing_links = set(Article.objects.values_list('link', flat=True))
                 articles_to_embed = []
@@ -145,7 +145,7 @@ class Command(BaseCommand):
                 feeds = Feed.objects.all()
                 if not feeds.exists():
                     self.stdout.write('No feeds found in DB. Waiting for next cycle...')
-                    signal.alarm(0)
+                    # signal.alarm(0)
                     time.sleep(sleep_time)
                     continue
 
@@ -223,7 +223,7 @@ class Command(BaseCommand):
                 self.stdout.write(f'Cycle completed: Added {added} articles')
 
                 # Clear alarm and embedding cache
-                signal.alarm(0)
+                # signal.alarm(0)
                 if embedding_model:
                     embedding_model.clear_cache()
 

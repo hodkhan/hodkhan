@@ -9,6 +9,8 @@ urlpatterns = [
     path("", include("app.urls")),
     path("admin/", admin.site.urls),
     path('account/', include('account.urls')),
+    path('news_api/', include('news_api.urls')),
+
     path(
         "robots.txt",
         TemplateView.as_view(template_name="robots.txt", content_type="text/plain"),

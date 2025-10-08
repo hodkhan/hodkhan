@@ -36,6 +36,7 @@ ALLOWED_HOSTS = ["127.0.0.1", "0.0.0.0", "0.0.0.0:11111", "hodkhan.ir",
 
 INSTALLED_APPS = [
     'app',
+    'news_api',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     "livereload",
+    'rest_framework',
     # 'account',
     # 'allauth',
     # 'allauth.account',
