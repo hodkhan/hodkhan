@@ -185,7 +185,7 @@ def regression():
             # Apply conversion and show debug info
             print("Processing vectors for", username)
             print("Vector column type:", merged_df['vector'].dtype)
-            print("First vector raw:", merged_df['vector'].iloc[0] if not merged_df.empty else "No data")
+            # print("First vector raw:", merged_df['vector'].iloc[0] if not merged_df.empty else "No data")
             
             X_vectors = merged_df['vector'].apply(convert_vector)
             X_vectors = X_vectors[X_vectors.notna()]
@@ -204,7 +204,7 @@ def regression():
         except Exception as e:
             print(f"\033[31mError processing vectors for {username}:\033[0m")
             print(f"Error details: {str(e)}")
-            print(f"Vector sample: {merged_df['vector'].iloc[0] if not merged_df.empty else 'No data'}")
+            # print(f"Vector sample: {merged_df['vector'].iloc[0] if not merged_df.empty else 'No data'}")
             continue
 
         # Calculate interest scores for each news item
