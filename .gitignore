@@ -4,3 +4,4 @@ hodkhan/app/management/commands/models/*
 env/
 EmbeddingGemma
 hodkhan/EmbeddingGemma
+*/*.pyc

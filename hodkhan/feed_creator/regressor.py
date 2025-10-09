@@ -130,7 +130,6 @@ def regression():
             continue
 
 
-        print(user_entries)
 
         # mark entries as not trained before training
         conn.execute(
