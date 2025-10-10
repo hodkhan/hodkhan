@@ -14,6 +14,31 @@ import datetime
 import pytz
 import jdatetime
 
+def build_whole_word_query(field_name, words):
+    query = Q()
+    for word in words:
+        w = word.strip()
+        if not w:
+            continue
+        base = Q(**{f"{field_name}__iexact": w})
+        start = Q(**{f"{field_name}__istartswith": w + " "})
+        end = Q(**{f"{field_name}__iendswith": " " + w})
+        middle = Q(**{f"{field_name}__icontains": " " + w + " "})
+        # Add common punctuation variants
+        punct_variants = [
+            Q(**{f"{field_name}__icontains": f" {w},"}),
+            Q(**{f"{field_name}__icontains": f" {w}."}),
+            Q(**{f"{field_name}__icontains": f",{w} "}),
+            Q(**{f"{field_name}__icontains": f".{w} "}),
+            Q(**{f"{field_name}__iendswith": f" {w},"}),
+            Q(**{f"{field_name}__iendswith": f" {w}."}),
+        ]
+        q = base | start | end | middle
+        for pv in punct_variants:
+            q |= pv
+        query |= q
+    return query
+
 
 def convert_timestamp_to_jalali(timestamp):
     if timestamp is None:
@@ -62,11 +87,10 @@ class GetFeedView(APIView):
             words = keyword_table.words.values_list('text', flat=True)
             if not words:
                 return Response({"articles": []})
-            query = Q()
-            for word in words:
-                query |= Q(title__icontains=word) | Q(abstract__icontains=word)
-
-            articles = Article.objects.filter(query)
+            
+            title_q = build_whole_word_query('title', words)
+            abstract_q = build_whole_word_query('abstract', words)
+            articles = Article.objects.filter(title_q | abstract_q).distinct()
             paginator = PageNumberPagination()
             paginated_articles = paginator.paginate_queryset(articles, request)
 
