@@ -1,7 +1,8 @@
 from django.urls import path
-from .views import GetFeedView, AddKeywordsView
+from .views import GetFeedView, AddKeywordsView, Search
 
 urlpatterns = [
     path('get_feed/', GetFeedView.as_view()),
     path('add_keywords/', AddKeywordsView.as_view(), name='add-keywords'),
+    path('search/', Search.as_view()),
 ]

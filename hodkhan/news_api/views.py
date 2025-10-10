@@ -170,3 +170,43 @@ class AddKeywordsView(APIView):
                 {"error": "Failed to add keywords", "detail": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+        
+
+# Search Key words
+class Search(APIView):
+    def get(self, request):
+        query_word = request.query_params.get('q', '').strip()
+
+        if not query_word:
+            return Response(
+                {"error": "Missing 'q' parameter"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        articles = Article.objects.filter(
+                Q(title__icontains=query_word) | Q(abstract__icontains=query_word)
+            )
+        print(len(articles))
+        paginator = PageNumberPagination()
+
+        paginated_articles = paginator.paginate_queryset(articles, request)
+        data = []
+        for a in paginated_articles:
+            published_jalali = None
+            if a.published is not None:
+                try:
+                    published_jalali = convert_timestamp_to_jalali(a.published)
+                except (ValueError, OSError, OverflowError):
+                    published_jalali = None
+            
+            article_feed = a.feed
+
+            data.append({
+                "title": a.title,
+                "link": a.link,
+                "abstract": a.abstract,
+                "cover": a.cover,
+                "published": published_jalali,
+                "feed": {"name": article_feed.name, "icon": article_feed.favicon}
+            })
+        return paginator.get_paginated_response({"articles": data})
