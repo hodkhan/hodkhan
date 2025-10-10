@@ -103,13 +103,16 @@ class GetFeedView(APIView):
                         published_jalali = convert_timestamp_to_jalali(a.published)
                     except (ValueError, OSError, OverflowError):
                         published_jalali = None
+                
+                article_feed = a.feed
 
                 data.append({
                     "title": a.title,
                     "link": a.link,
                     "abstract": a.abstract,
                     "cover": a.cover,
-                    "published": published_jalali
+                    "published": published_jalali,
+                    "feed": {"name": article_feed.name, "icon": article_feed.favicon}
                 })
             return paginator.get_paginated_response({"articles": data})
         except KeyWordTable.DoesNotExist:
