@@ -142,7 +142,7 @@ class GetFeedView(APIView):
         try:
             articles = Article.objects.filter(
                 articlekeywordtable__keyword_table=keyword_table
-            ).distinct()
+            ).distinct().order_by('-published')
             print(len(articles))           
 
             paginator = PageNumberPagination()
