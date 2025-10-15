@@ -4,23 +4,21 @@ from rest_framework import status
 from rest_framework.pagination import PageNumberPagination 
 from django.db.models import Q
 from django.db import transaction
-from .models import KeyWordTable, SearchKeyWord
-
+from .models import KeyWordTable, SearchKeyWord, AgencyKey, ArticleKeywordTable
 from app.models import Article
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
-from .models import AgencyKey
 import datetime
 import pytz
 import jdatetime
 
-def build_whole_word_query(field_name, words):
+
+def build_whole_word_query(field_name, words, exclude_mode=False):
     query = Q()
     for word in words:
         w = word.strip()
         if not w:
             continue
-        base = Q(**{f"{field_name}__iexact": w})
         start = Q(**{f"{field_name}__istartswith": w + " "})
         end = Q(**{f"{field_name}__iendswith": " " + w})
         middle = Q(**{f"{field_name}__icontains": " " + w + " "})
@@ -33,11 +31,69 @@ def build_whole_word_query(field_name, words):
             Q(**{f"{field_name}__iendswith": f" {w},"}),
             Q(**{f"{field_name}__iendswith": f" {w}."}),
         ]
-        q = base | start | end | middle
+        q =  start | end | middle
         for pv in punct_variants:
             q |= pv
         query |= q
+
+    if exclude_mode:
+        return ~query
     return query
+
+
+# Search All or some Articles for Keywords
+# send a list of Articles or set articles_to_search = None for searching all 
+def Search_Articles(keyword_table, articles_to_search = None):
+
+    words = keyword_table.words.values_list('text', flat=True)
+    exclude_words = keyword_table.ban_words.values_list('text', flat=True)
+    if not words:
+        return []
+    
+    title_q = build_whole_word_query('title', words)
+    abstract_q = build_whole_word_query('abstract', words)
+    include_query = title_q | abstract_q
+
+    exclude_query = Q()
+    
+    if exclude_words:
+        title_exclude_q = build_whole_word_query('title', exclude_words)
+        abstract_exclude_q = build_whole_word_query('abstract', exclude_words)
+        exclude_query = title_exclude_q | abstract_exclude_q
+
+    if articles_to_search is not None:
+        article_ids = [article.id for article in articles_to_search if hasattr(article, 'id') and article.id]
+        articles = Article.objects.filter(include_query, id__in=article_ids)
+    else:
+        articles = Article.objects.filter(include_query)
+    if exclude_words:
+        articles = articles.exclude(exclude_query)
+    
+    articles = articles.distinct()
+    return articles
+
+def connect_article_to_keywordTable(articles, keyword_table):
+    created_connections = []
+    for article in articles:
+        connection, created = ArticleKeywordTable.objects.get_or_create(
+            article = article,
+            keyword_table=keyword_table
+        )
+        if created:
+            created_connections.append(connection)
+    
+
+    return created_connections
+
+def Append_new_articles(articles):
+    keyword_tables = KeyWordTable.objects.all()
+    connection_count = 0
+    for keyword_table in keyword_tables:
+        found_articles = Search_Articles(keyword_table, articles)
+        created_connections = connect_article_to_keywordTable(found_articles, keyword_table)
+        connection_count += len(created_connections)
+        
+    return connection_count
 
 
 def convert_timestamp_to_jalali(timestamp):
@@ -63,7 +119,7 @@ def convert_timestamp_to_jalali(timestamp):
 # Agency authentication
 class APIKeyAuthentication(BaseAuthentication):
     def authenticate(self, request):
-        key = request.headers.get('Authentication')
+        key = request.headers.get('Authorization')
         if not key:
             raise AuthenticationFailed('No API key provided')
 
@@ -84,13 +140,11 @@ class GetFeedView(APIView):
         except KeyWordTable.DoesNotExist:
             return Response({"error": "No keywords configured for your agency"}, status=404)
         try:
-            words = keyword_table.words.values_list('text', flat=True)
-            if not words:
-                return Response({"articles": []})
-            
-            title_q = build_whole_word_query('title', words)
-            abstract_q = build_whole_word_query('abstract', words)
-            articles = Article.objects.filter(title_q | abstract_q).distinct()
+            articles = Article.objects.filter(
+                articlekeywordtable__keyword_table=keyword_table
+            ).distinct()
+            print(len(articles))           
+
             paginator = PageNumberPagination()
             paginated_articles = paginator.paginate_queryset(articles, request)
 
@@ -107,6 +161,7 @@ class GetFeedView(APIView):
                 article_feed = a.feed
 
                 data.append({
+                    "id": a.id,
                     "title": a.title,
                     "link": a.link,
                     "abstract": a.abstract,
@@ -209,4 +264,34 @@ class Search(APIView):
                 "published": published_jalali,
                 "feed": {"name": article_feed.name, "icon": article_feed.favicon}
             })
-        return paginator.get_paginated_response({"articles": data})
+        return paginator.get_paginated_response({"articles": data})    
+
+
+# Append Key words for a user
+class SearchAndAppendArticles(APIView):
+    authentication_classes = [APIKeyAuthentication]
+
+    def post(self, request):
+        agency = request.user
+        keyword_table = agency.keyword_table # get agency keywords
+
+        try:
+
+            delete_count, _ = ArticleKeywordTable.objects.filter(
+                keyword_table=keyword_table
+            ).delete()
+            articles = Search_Articles(keyword_table)
+            created = connect_article_to_keywordTable(articles, keyword_table)
+
+            return Response({
+                "message": "Keyword table updated successfully",
+                "deleted articles" : delete_count,
+                "added articles": len(created),
+                "agency": agency.name
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response(
+                {"error": "Failed to updated Keyword table", "detail": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

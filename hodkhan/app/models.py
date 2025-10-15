@@ -38,6 +38,9 @@ class Article(models.Model):
     def __str__(self):
         return self.title
 
+    class Meta:
+        indexes = [models.Index(fields=["title", "abstract"])]
+
 
 class UserFeed(models.Model):
     id = models.CharField(max_length=15, primary_key=True, default=uuid4, editable=False)

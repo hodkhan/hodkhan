@@ -15,7 +15,7 @@ import os
 from hazm import Normalizer, word_tokenize
 import pickle
 from app.management.commands.gemma_embedding import GemmaEmbedding
-
+from news_api.views import Append_new_articles
 
 class TimeoutException(Exception):
     pass
@@ -212,15 +212,20 @@ class Command(BaseCommand):
 
                 # Save articles
                 added = 0
+                newly_saved_articles = []
                 for article in articles_to_save:
                     try:
                         article.save()
                         existing_links.add(article.link)
+                        newly_saved_articles.append(article)
                         added += 1
                     except Exception as e:
                         self.stdout.write(f'Error saving article: {e}')
+                # Search added articles for keywords
+                created_connection_count = Append_new_articles(newly_saved_articles)
 
                 self.stdout.write(f'Cycle completed: Added {added} articles')
+                self.stdout.write(f'Added {created_connection_count} new connection')
 
                 # Clear alarm and embedding cache
                 signal.alarm(0)
