@@ -1,9 +1,10 @@
 from django.contrib import admin
-from .models import AgencyKey, SearchKeyWord, KeyWordTable , BanKeyWord
+from .models import AgencyKey, SearchKeyWord, KeyWordTable , BanKeyWord, ArticleKeywordTable
 
 admin.site.register(SearchKeyWord)
 admin.site.register(KeyWordTable)
 admin.site.register(BanKeyWord)
+admin.site.register(ArticleKeywordTable)
 
 @admin.register(AgencyKey)
 class AgencyKeyAdmin(admin.ModelAdmin):

@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.pagination import PageNumberPagination 
 from django.db.models import Q
 from django.db import transaction
-from .models import KeyWordTable, SearchKeyWord, AgencyKey, ArticleKeywordTable
+from .models import KeyWordTable, SearchKeyWord, AgencyKey, ArticleKeywordTable, BanKeyWord
 from app.models import Article
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
@@ -174,58 +174,75 @@ class GetFeedView(APIView):
             return Response({"error": "User not found"}, status=404)
 
 
+def append_keyword_to_table(request, ban_word=False):
+    agency = request.user
+    keywords_str = request.data.get('words', '').strip()
+
+    if not keywords_str:
+        return Response(
+            {"error": "Missing 'keywords' field (comma-separated string)"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    keyword_list = [kw.strip() for kw in keywords_str.split(',') if kw.strip()]
+    if not keyword_list:
+        return Response(
+            {"error": "No valid keywords provided"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    for kw in keyword_list:
+        if len(kw) > 100:
+            return Response(
+                {"error": f"Keyword too long: '{kw}' (max 100 chars)"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+    try:
+        keyword_table, created = KeyWordTable.objects.get_or_create(agency=agency)
+
+        with transaction.atomic():
+            created_words = []
+            for word in keyword_list:
+                if not ban_word:
+                    obj, created = SearchKeyWord.objects.get_or_create(text=word)
+                    keyword_table.words.add(obj)
+                else:
+                    obj, created = BanKeyWord.objects.get_or_create(text=word)
+                    keyword_table.ban_words.add(obj)
+
+                if created:
+                    created_words.append(word)
+        word = 'keywords' if not ban_word else 'banwords'
+        return Response({
+            "message": f"{word} added successfully",
+            f"total_{word}_added": len(keyword_list),
+            "newly_created_words": created_words,
+            "agency": agency.name
+        }, status=status.HTTP_201_CREATED)
+    
+    except Exception as e:
+        return Response(
+            {"error": "Failed to add keywords", "detail": str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
 # Append Key words for a user
 class AddKeywordsView(APIView):
     authentication_classes = [APIKeyAuthentication]
 
     def post(self, request):
-        agency = request.user
-        keywords_str = request.data.get('keywords', '').strip()
+        return append_keyword_to_table(request)
+    
 
-        if not keywords_str:
-            return Response(
-                {"error": "Missing 'keywords' field (comma-separated string)"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+# Append Ban words for a user
+class AddBanwordsView(APIView):
+    authentication_classes = [APIKeyAuthentication]
 
-        keyword_list = [kw.strip() for kw in keywords_str.split(',') if kw.strip()]
-        if not keyword_list:
-            return Response(
-                {"error": "No valid keywords provided"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+    def post(self, request):
+        return append_keyword_to_table(request, ban_word=True)
 
-        for kw in keyword_list:
-            if len(kw) > 100:
-                return Response(
-                    {"error": f"Keyword too long: '{kw}' (max 100 chars)"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-
-        try:
-            keyword_table, created = KeyWordTable.objects.get_or_create(agency=agency)
-
-            with transaction.atomic():
-                created_words = []
-                for word in keyword_list:
-                    obj, created = SearchKeyWord.objects.get_or_create(text=word)
-                    if created:
-                        created_words.append(word)
-                    keyword_table.words.add(obj)
-
-            return Response({
-                "message": "Keywords added successfully",
-                "total_keywords_added": len(keyword_list),
-                "newly_created_words": created_words,
-                "agency": agency.name
-            }, status=status.HTTP_201_CREATED)
-
-        except Exception as e:
-            return Response(
-                {"error": "Failed to add keywords", "detail": str(e)},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-        
 
 # Search Key words
 class Search(APIView):
